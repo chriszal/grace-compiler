@@ -87,7 +87,6 @@ stmt :
     | if_stmt
     | while_stmt
     | assign_stmt
-    | T_SEPARATOR
     ;
 
 assign_stmt :
@@ -97,8 +96,6 @@ assign_stmt :
 l_value :
     T_ID
     | array_access
-    | T_FIXED_CHAR
-    | T_STR
     ;
 
 array_access :
@@ -116,12 +113,11 @@ while_stmt :
 
 expr :
     l_value
-    | expr '+' expr   %prec '+'
-    | expr '-' expr   %prec '+'
+    | expr '+' expr
+    | expr '-' expr
     | expr '*' expr
     | '(' expr ')'
     | T_NUM
-    | T_ID
     | logical_expr
     ;
 
