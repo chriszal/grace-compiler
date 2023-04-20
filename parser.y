@@ -10,9 +10,9 @@ void yyerror(const char *msg);
 %token T_AND T_CHAR T_DIV T_DO T_ELSE T_FUN T_IF T_INT T_MOD T_NOT T_NOTHING T_OR T_REF T_RETURN T_THEN T_VAR T_WHILE T_ID T_NUM T_FIXED_CHAR T_STR T_OPERATOR T_SEPARATOR
 
 %expect 1
+%left T_OPERATOR
 %left '+' '-'
 %left '*'
-%left T_OPERATOR
 
 %%
 
