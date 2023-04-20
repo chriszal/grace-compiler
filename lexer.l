@@ -35,8 +35,7 @@ d           [0-9]
 fixed_char  (\\.|[^\\'"])
 str_char    (\\.|[^\\""])
 operator    (\+|-|\*|\/|#|=|<>|<|>|<=|>=)
-separator   [()[\]{};,:
-]
+separator   [()[\]{};,:]
 
 %%
 
@@ -66,8 +65,7 @@ separator   [()[\]{};,:
 {separator}     { return T_SEPARATOR; }
 
 {ws}            {}
-\$[^
-]*\n          {}
+\$.*\n          { }
 \$\$.*\$\$       {}
 
 .               { printf("Illegal token\n"); exit(1); }
