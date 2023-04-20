@@ -86,6 +86,23 @@ stmt :
     | compound_stmt
     | if_stmt
     | while_stmt
+    | assign_stmt
+    | T_SEPARATOR
+    ;
+
+assign_stmt :
+    l_value T_SEPARATOR expr T_SEPARATOR
+    ;
+
+l_value :
+    T_ID
+    | array_access
+    | T_FIXED_CHAR
+    | T_STR
+    ;
+
+array_access :
+    expr '[' expr ']'
     ;
 
 if_stmt :
@@ -97,16 +114,20 @@ while_stmt :
     "while" expr "do" stmt
     ;
 
-
-expr : 
-    expr '+' expr   %prec '+'
-    | expr '-' expr %prec '+'
+expr :
+    l_value
+    | expr '+' expr   %prec '+'
+    | expr '-' expr   %prec '+'
     | expr '*' expr
     | '(' expr ')'
     | T_NUM
     | T_ID
+    | logical_expr
     ;
 
+logical_expr :
+    expr T_OPERATOR expr
+    ;
 
 %%
 
@@ -116,7 +137,7 @@ void yyerror(const char *msg) {
 }
 
 int main() {
-        int result = yyparse();
-        if (result == 0) printf("Success.\n");
-        return result;
+    int result = yyparse();
+    if (result == 0) printf("Success.\n");
+    return result;
 }
