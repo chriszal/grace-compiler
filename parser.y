@@ -11,7 +11,8 @@ void yyerror(const char *msg);
 
 %expect 1
 %left '+' '-'
-%left '*' 
+%left '*'
+%left T_OPERATOR
 
 %%
 
@@ -87,6 +88,7 @@ stmt :
     | if_stmt
     | while_stmt
     | assign_stmt
+    | T_SEPARATOR
     ;
 
 assign_stmt :
