@@ -79,24 +79,34 @@ compound_stmt :
     "begin" stmtlst "end"
     ;
 
-stmt : 
+stmt :
     var_declaration
     | fun_definition
     | fun_declaration
     | compound_stmt
-    | "if" expr "then" stmt
-    | "if" expr "then" stmt "else" stmt
-    | "while" expr "do" stmt
+    | if_stmt
+    | while_stmt
     ;
 
+if_stmt :
+    "if" expr "then" stmt "else" stmt
+    | "if" expr "then" stmt
+    ;
+
+while_stmt :
+    "while" expr "do" stmt
+    ;
+
+
 expr : 
-    expr '+' expr
+    expr '+' expr   %prec '+'
+    | expr '-' expr %prec '+'
     | expr '*' expr
-    | expr '/' expr
     | '(' expr ')'
     | T_NUM
     | T_ID
     ;
+
 
 %%
 

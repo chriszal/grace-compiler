@@ -35,7 +35,7 @@ d           [0-9]
 fixed_char  (\\.|[^\\'"])
 str_char    (\\.|[^\\""])
 operator    (\+|-|\*|\/|#|=|<>|<|>|<=|>=)
-separator   (\(|\)|\[|\]|{|}|,|;|:|<-)
+separator   [()[\]{};,:<-]
 
 %%
 
@@ -72,10 +72,4 @@ separator   (\(|\)|\[|\]|{|}|,|;|:|<-)
 
 %%
 
-int main() {
-    int token;
-    do {
-        token = yylex();
-        printf("token=%d, lexeme=\"%s\"\n", token, yytext);
-    } while(token != 0);
-}
+
