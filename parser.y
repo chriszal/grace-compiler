@@ -92,7 +92,7 @@ stmt :
     ;
 
 assign_stmt :
-    l_value T_SEPARATOR expr T_SEPARATOR
+    l_value T_SEPARATOR expr
     ;
 
 l_value :
@@ -120,7 +120,7 @@ expr :
     | expr '*' expr
     | '(' expr ')'
     | T_NUM
-    | logical_expr
+    | T_OPERATOR logical_expr
     ;
 
 logical_expr :
