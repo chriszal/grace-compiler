@@ -1,6 +1,28 @@
 %{
-#include "parser.tab.h"
 #include <stdio.h>
+#define T_AND        1001
+#define T_CHAR       1002
+#define T_DIV        1003
+#define T_DO         1004
+#define T_ELSE       1005
+#define T_FUN        1006
+#define T_IF         1007
+#define T_INT        1008
+#define T_MOD        1009
+#define T_NOT        1010
+#define T_NOTHING    1011
+#define T_OR         1012
+#define T_REF        1013
+#define T_RETURN     1014
+#define T_THEN       1015
+#define T_VAR        1016
+#define T_WHILE      1017
+#define T_ID         1018
+#define T_NUM        1019
+#define T_FIXED_CHAR 1020
+#define T_STR        1021
+#define T_OPERATOR   1022
+#define T_SEPARATOR  1023
 %}
 
 %option noyywrap
@@ -56,3 +78,11 @@ separator   [\(\)\[\]\{\},;:]|<-
 .               { printf("Illegal token\n"); exit(1); }
 
 %%
+
+int main() {
+    int token;
+    do {
+        token = yylex();
+        printf("token=%d, lexeme=\"%s\"\n", token, yytext);
+    } while(token != 0);
+}
