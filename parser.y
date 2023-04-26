@@ -13,6 +13,10 @@ void yyerror(const char *msg);
 %left T_OPERATOR
 %left '+' '-'
 %left '*'
+%left T_AND T_OR
+%left T_EQ T_NE T_LT T_GT T_LE T_GE
+
+%start program
 
 %%
 
@@ -77,7 +81,7 @@ stmtlst :
     ;
 
 compound_stmt :
-    "begin" stmtlst "end"
+    '{' stmtlst '}'
     ;
 
 stmt :
@@ -88,6 +92,8 @@ stmt :
     | if_stmt
     | while_stmt
     | assign_stmt
+    | fun_call_stmt
+    | return_stmt
     | T_SEPARATOR
     ;
 
@@ -113,21 +119,48 @@ while_stmt :
     "while" expr "do" stmt
     ;
 
+fun_call_stmt :
+    T_ID '(' actual_param_list ')' T_SEPARATOR
+    ;
+
+actual_param_list :
+    | actual_param_list ',' expr
+    ;
+
+return_stmt :
+    "return" expr T_SEPARATOR
+    | "return" T_SEPARATOR
+    ;
+
 expr :
     l_value
     | expr '+' expr
     | expr '-' expr
     | expr '*' expr
+    | expr T_AND expr
+    | expr T_OR expr
+    | expr T_EQ expr
+    | expr T_NE expr
+    | expr T_LT expr
+    | expr T_GT expr
+    | expr T_LE expr
+    | expr T_GE expr
     | '(' expr ')'
     | T_NUM
     | T_OPERATOR logical_expr
+    | fun_call_expr
     ;
 
 logical_expr :
     expr T_OPERATOR expr
     ;
 
+fun_call_expr :
+    T_ID '(' actual_param_list ')'
+    ;
+
 %%
+
 
 void yyerror(const char *msg) {
   fprintf(stderr, "%s\n", msg);

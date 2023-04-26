@@ -1,0 +1,1956 @@
+Terminals unused in grammar
+
+    T_DIV
+    T_DO
+    T_ELSE
+    T_IF
+    T_MOD
+    T_NOT
+    T_NOTHING
+    T_RETURN
+    T_THEN
+    T_WHILE
+    T_FIXED_CHAR
+    T_STR
+
+
+State 49 conflicts: 1 shift/reduce
+State 83 conflicts: 1 shift/reduce
+State 84 conflicts: 1 shift/reduce
+State 85 conflicts: 1 shift/reduce
+State 86 conflicts: 1 shift/reduce
+State 87 conflicts: 1 shift/reduce
+State 88 conflicts: 1 shift/reduce
+State 89 conflicts: 1 shift/reduce
+State 90 conflicts: 1 shift/reduce
+State 91 conflicts: 1 shift/reduce
+State 92 conflicts: 1 shift/reduce
+State 93 conflicts: 1 shift/reduce
+State 104 conflicts: 1 shift/reduce
+State 105 conflicts: 1 shift/reduce
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: declarations compound_stmt
+
+    2 declarations: %empty
+    3             | declarations declaration
+
+    4 declaration: var_declaration
+    5            | fun_declaration
+    6            | fun_definition
+
+    7 var_declaration: T_VAR var_list ':' type ';'
+
+    8 var_list: T_ID
+    9         | var_list ',' T_ID
+
+   10 type: T_INT
+   11     | T_CHAR
+   12     | array_type
+
+   13 array_type: type '[' T_NUM ']'
+
+   14 fun_declaration: T_FUN T_ID '(' formal_param_list ')' ':' type ';'
+
+   15 formal_param_list: %empty
+   16                  | formal_param_list ',' formal_params
+
+   17 formal_params: T_REF param_list ':' type
+   18              | param_list ':' type
+
+   19 param_list: T_ID
+   20           | param_list ',' T_ID
+
+   21 fun_definition: T_FUN T_ID '(' formal_param_list ')' ':' type declarations compound_stmt
+
+   22 stmtlst: %empty
+   23        | stmtlst stmt
+
+   24 compound_stmt: '{' stmtlst '}'
+
+   25 stmt: var_declaration
+   26     | fun_definition
+   27     | fun_declaration
+   28     | compound_stmt
+   29     | if_stmt
+   30     | while_stmt
+   31     | assign_stmt
+   32     | fun_call_stmt
+   33     | return_stmt
+   34     | T_SEPARATOR
+
+   35 assign_stmt: l_value T_SEPARATOR expr
+
+   36 l_value: T_ID
+   37        | array_access
+
+   38 array_access: expr '[' expr ']'
+
+   39 if_stmt: "if" expr "then" stmt "else" stmt
+   40        | "if" expr "then" stmt
+
+   41 while_stmt: "while" expr "do" stmt
+
+   42 fun_call_stmt: T_ID '(' actual_param_list ')' T_SEPARATOR
+
+   43 actual_param_list: %empty
+   44                  | actual_param_list ',' expr
+
+   45 return_stmt: "return" expr T_SEPARATOR
+   46            | "return" T_SEPARATOR
+
+   47 expr: l_value
+   48     | expr '+' expr
+   49     | expr '-' expr
+   50     | expr '*' expr
+   51     | expr T_AND expr
+   52     | expr T_OR expr
+   53     | expr T_EQ expr
+   54     | expr T_NE expr
+   55     | expr T_LT expr
+   56     | expr T_GT expr
+   57     | expr T_LE expr
+   58     | expr T_GE expr
+   59     | '(' expr ')'
+   60     | T_NUM
+   61     | T_OPERATOR logical_expr
+   62     | fun_call_expr
+
+   63 logical_expr: expr T_OPERATOR expr
+
+   64 fun_call_expr: T_ID '(' actual_param_list ')'
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    '(' (40) 14 21 42 59 64
+    ')' (41) 14 21 42 59 64
+    '*' (42) 50
+    '+' (43) 48
+    ',' (44) 9 16 20 44
+    '-' (45) 49
+    ':' (58) 7 14 17 18 21
+    ';' (59) 7 14
+    '[' (91) 13 38
+    ']' (93) 13 38
+    '{' (123) 24
+    '}' (125) 24
+    error (256)
+    T_AND (258) 51
+    T_CHAR (259) 11
+    T_DIV (260)
+    T_DO (261)
+    T_ELSE (262)
+    T_FUN (263) 14 21
+    T_IF (264)
+    T_INT (265) 10
+    T_MOD (266)
+    T_NOT (267)
+    T_NOTHING (268)
+    T_OR (269) 52
+    T_REF (270) 17
+    T_RETURN (271)
+    T_THEN (272)
+    T_VAR (273) 7
+    T_WHILE (274)
+    T_ID (275) 8 9 14 19 20 21 36 42 64
+    T_NUM (276) 13 60
+    T_FIXED_CHAR (277)
+    T_STR (278)
+    T_OPERATOR (279) 61 63
+    T_SEPARATOR (280) 34 35 42 45 46
+    T_EQ (281) 53
+    T_NE (282) 54
+    T_LT (283) 55
+    T_GT (284) 56
+    T_LE (285) 57
+    T_GE (286) 58
+    "if" (287) 39 40
+    "then" (288) 39 40
+    "else" (289) 39
+    "while" (290) 41
+    "do" (291) 41
+    "return" (292) 45 46
+
+
+Nonterminals, with rules where they appear
+
+    $accept (50)
+        on left: 0
+    program (51)
+        on left: 1
+        on right: 0
+    declarations (52)
+        on left: 2 3
+        on right: 1 3 21
+    declaration (53)
+        on left: 4 5 6
+        on right: 3
+    var_declaration (54)
+        on left: 7
+        on right: 4 25
+    var_list (55)
+        on left: 8 9
+        on right: 7 9
+    type (56)
+        on left: 10 11 12
+        on right: 7 13 14 17 18 21
+    array_type (57)
+        on left: 13
+        on right: 12
+    fun_declaration (58)
+        on left: 14
+        on right: 5 27
+    formal_param_list (59)
+        on left: 15 16
+        on right: 14 16 21
+    formal_params (60)
+        on left: 17 18
+        on right: 16
+    param_list (61)
+        on left: 19 20
+        on right: 17 18 20
+    fun_definition (62)
+        on left: 21
+        on right: 6 26
+    stmtlst (63)
+        on left: 22 23
+        on right: 23 24
+    compound_stmt (64)
+        on left: 24
+        on right: 1 21 28
+    stmt (65)
+        on left: 25 26 27 28 29 30 31 32 33 34
+        on right: 23 39 40 41
+    assign_stmt (66)
+        on left: 35
+        on right: 31
+    l_value (67)
+        on left: 36 37
+        on right: 35 47
+    array_access (68)
+        on left: 38
+        on right: 37
+    if_stmt (69)
+        on left: 39 40
+        on right: 29
+    while_stmt (70)
+        on left: 41
+        on right: 30
+    fun_call_stmt (71)
+        on left: 42
+        on right: 32
+    actual_param_list (72)
+        on left: 43 44
+        on right: 42 44 64
+    return_stmt (73)
+        on left: 45 46
+        on right: 33
+    expr (74)
+        on left: 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62
+        on right: 35 38 39 40 41 44 45 48 49 50 51 52 53 54 55 56 57 58 59 63
+    logical_expr (75)
+        on left: 63
+        on right: 61
+    fun_call_expr (76)
+        on left: 64
+        on right: 62
+
+
+State 0
+
+    0 $accept: . program $end
+
+    $default  reduce using rule 2 (declarations)
+
+    program       go to state 1
+    declarations  go to state 2
+
+
+State 1
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 3
+
+
+State 2
+
+    1 program: declarations . compound_stmt
+    3 declarations: declarations . declaration
+
+    T_FUN  shift, and go to state 4
+    T_VAR  shift, and go to state 5
+    '{'    shift, and go to state 6
+
+    declaration      go to state 7
+    var_declaration  go to state 8
+    fun_declaration  go to state 9
+    fun_definition   go to state 10
+    compound_stmt    go to state 11
+
+
+State 3
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+State 4
+
+   14 fun_declaration: T_FUN . T_ID '(' formal_param_list ')' ':' type ';'
+   21 fun_definition: T_FUN . T_ID '(' formal_param_list ')' ':' type declarations compound_stmt
+
+    T_ID  shift, and go to state 12
+
+
+State 5
+
+    7 var_declaration: T_VAR . var_list ':' type ';'
+
+    T_ID  shift, and go to state 13
+
+    var_list  go to state 14
+
+
+State 6
+
+   24 compound_stmt: '{' . stmtlst '}'
+
+    $default  reduce using rule 22 (stmtlst)
+
+    stmtlst  go to state 15
+
+
+State 7
+
+    3 declarations: declarations declaration .
+
+    $default  reduce using rule 3 (declarations)
+
+
+State 8
+
+    4 declaration: var_declaration .
+
+    $default  reduce using rule 4 (declaration)
+
+
+State 9
+
+    5 declaration: fun_declaration .
+
+    $default  reduce using rule 5 (declaration)
+
+
+State 10
+
+    6 declaration: fun_definition .
+
+    $default  reduce using rule 6 (declaration)
+
+
+State 11
+
+    1 program: declarations compound_stmt .
+
+    $default  reduce using rule 1 (program)
+
+
+State 12
+
+   14 fun_declaration: T_FUN T_ID . '(' formal_param_list ')' ':' type ';'
+   21 fun_definition: T_FUN T_ID . '(' formal_param_list ')' ':' type declarations compound_stmt
+
+    '('  shift, and go to state 16
+
+
+State 13
+
+    8 var_list: T_ID .
+
+    $default  reduce using rule 8 (var_list)
+
+
+State 14
+
+    7 var_declaration: T_VAR var_list . ':' type ';'
+    9 var_list: var_list . ',' T_ID
+
+    ':'  shift, and go to state 17
+    ','  shift, and go to state 18
+
+
+State 15
+
+   23 stmtlst: stmtlst . stmt
+   24 compound_stmt: '{' stmtlst . '}'
+
+    T_FUN        shift, and go to state 4
+    T_VAR        shift, and go to state 5
+    T_ID         shift, and go to state 19
+    T_NUM        shift, and go to state 20
+    T_OPERATOR   shift, and go to state 21
+    T_SEPARATOR  shift, and go to state 22
+    '('          shift, and go to state 23
+    '{'          shift, and go to state 6
+    '}'          shift, and go to state 24
+    "if"         shift, and go to state 25
+    "while"      shift, and go to state 26
+    "return"     shift, and go to state 27
+
+    var_declaration  go to state 28
+    fun_declaration  go to state 29
+    fun_definition   go to state 30
+    compound_stmt    go to state 31
+    stmt             go to state 32
+    assign_stmt      go to state 33
+    l_value          go to state 34
+    array_access     go to state 35
+    if_stmt          go to state 36
+    while_stmt       go to state 37
+    fun_call_stmt    go to state 38
+    return_stmt      go to state 39
+    expr             go to state 40
+    fun_call_expr    go to state 41
+
+
+State 16
+
+   14 fun_declaration: T_FUN T_ID '(' . formal_param_list ')' ':' type ';'
+   21 fun_definition: T_FUN T_ID '(' . formal_param_list ')' ':' type declarations compound_stmt
+
+    $default  reduce using rule 15 (formal_param_list)
+
+    formal_param_list  go to state 42
+
+
+State 17
+
+    7 var_declaration: T_VAR var_list ':' . type ';'
+
+    T_CHAR  shift, and go to state 43
+    T_INT   shift, and go to state 44
+
+    type        go to state 45
+    array_type  go to state 46
+
+
+State 18
+
+    9 var_list: var_list ',' . T_ID
+
+    T_ID  shift, and go to state 47
+
+
+State 19
+
+   36 l_value: T_ID .
+   42 fun_call_stmt: T_ID . '(' actual_param_list ')' T_SEPARATOR
+   64 fun_call_expr: T_ID . '(' actual_param_list ')'
+
+    '('  shift, and go to state 48
+
+    $default  reduce using rule 36 (l_value)
+
+
+State 20
+
+   60 expr: T_NUM .
+
+    $default  reduce using rule 60 (expr)
+
+
+State 21
+
+   61 expr: T_OPERATOR . logical_expr
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 51
+    logical_expr   go to state 52
+    fun_call_expr  go to state 41
+
+
+State 22
+
+   34 stmt: T_SEPARATOR .
+
+    $default  reduce using rule 34 (stmt)
+
+
+State 23
+
+   59 expr: '(' . expr ')'
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 53
+    fun_call_expr  go to state 41
+
+
+State 24
+
+   24 compound_stmt: '{' stmtlst '}' .
+
+    $default  reduce using rule 24 (compound_stmt)
+
+
+State 25
+
+   39 if_stmt: "if" . expr "then" stmt "else" stmt
+   40        | "if" . expr "then" stmt
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 54
+    fun_call_expr  go to state 41
+
+
+State 26
+
+   41 while_stmt: "while" . expr "do" stmt
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 55
+    fun_call_expr  go to state 41
+
+
+State 27
+
+   45 return_stmt: "return" . expr T_SEPARATOR
+   46            | "return" . T_SEPARATOR
+
+    T_ID         shift, and go to state 49
+    T_NUM        shift, and go to state 20
+    T_OPERATOR   shift, and go to state 21
+    T_SEPARATOR  shift, and go to state 56
+    '('          shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 57
+    fun_call_expr  go to state 41
+
+
+State 28
+
+   25 stmt: var_declaration .
+
+    $default  reduce using rule 25 (stmt)
+
+
+State 29
+
+   27 stmt: fun_declaration .
+
+    $default  reduce using rule 27 (stmt)
+
+
+State 30
+
+   26 stmt: fun_definition .
+
+    $default  reduce using rule 26 (stmt)
+
+
+State 31
+
+   28 stmt: compound_stmt .
+
+    $default  reduce using rule 28 (stmt)
+
+
+State 32
+
+   23 stmtlst: stmtlst stmt .
+
+    $default  reduce using rule 23 (stmtlst)
+
+
+State 33
+
+   31 stmt: assign_stmt .
+
+    $default  reduce using rule 31 (stmt)
+
+
+State 34
+
+   35 assign_stmt: l_value . T_SEPARATOR expr
+   47 expr: l_value .
+
+    T_SEPARATOR  shift, and go to state 58
+
+    $default  reduce using rule 47 (expr)
+
+
+State 35
+
+   37 l_value: array_access .
+
+    $default  reduce using rule 37 (l_value)
+
+
+State 36
+
+   29 stmt: if_stmt .
+
+    $default  reduce using rule 29 (stmt)
+
+
+State 37
+
+   30 stmt: while_stmt .
+
+    $default  reduce using rule 30 (stmt)
+
+
+State 38
+
+   32 stmt: fun_call_stmt .
+
+    $default  reduce using rule 32 (stmt)
+
+
+State 39
+
+   33 stmt: return_stmt .
+
+    $default  reduce using rule 33 (stmt)
+
+
+State 40
+
+   38 array_access: expr . '[' expr ']'
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+
+    T_AND  shift, and go to state 59
+    T_OR   shift, and go to state 60
+    '+'    shift, and go to state 61
+    '-'    shift, and go to state 62
+    '*'    shift, and go to state 63
+    T_EQ   shift, and go to state 64
+    T_NE   shift, and go to state 65
+    T_LT   shift, and go to state 66
+    T_GT   shift, and go to state 67
+    T_LE   shift, and go to state 68
+    T_GE   shift, and go to state 69
+    '['    shift, and go to state 70
+
+
+State 41
+
+   62 expr: fun_call_expr .
+
+    $default  reduce using rule 62 (expr)
+
+
+State 42
+
+   14 fun_declaration: T_FUN T_ID '(' formal_param_list . ')' ':' type ';'
+   16 formal_param_list: formal_param_list . ',' formal_params
+   21 fun_definition: T_FUN T_ID '(' formal_param_list . ')' ':' type declarations compound_stmt
+
+    ','  shift, and go to state 71
+    ')'  shift, and go to state 72
+
+
+State 43
+
+   11 type: T_CHAR .
+
+    $default  reduce using rule 11 (type)
+
+
+State 44
+
+   10 type: T_INT .
+
+    $default  reduce using rule 10 (type)
+
+
+State 45
+
+    7 var_declaration: T_VAR var_list ':' type . ';'
+   13 array_type: type . '[' T_NUM ']'
+
+    ';'  shift, and go to state 73
+    '['  shift, and go to state 74
+
+
+State 46
+
+   12 type: array_type .
+
+    $default  reduce using rule 12 (type)
+
+
+State 47
+
+    9 var_list: var_list ',' T_ID .
+
+    $default  reduce using rule 9 (var_list)
+
+
+State 48
+
+   42 fun_call_stmt: T_ID '(' . actual_param_list ')' T_SEPARATOR
+   64 fun_call_expr: T_ID '(' . actual_param_list ')'
+
+    $default  reduce using rule 43 (actual_param_list)
+
+    actual_param_list  go to state 75
+
+
+State 49
+
+   36 l_value: T_ID .
+   64 fun_call_expr: T_ID . '(' actual_param_list ')'
+
+    '('  shift, and go to state 76
+
+    '('       [reduce using rule 36 (l_value)]
+    $default  reduce using rule 36 (l_value)
+
+
+State 50
+
+   47 expr: l_value .
+
+    $default  reduce using rule 47 (expr)
+
+
+State 51
+
+   38 array_access: expr . '[' expr ']'
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+   63 logical_expr: expr . T_OPERATOR expr
+
+    T_AND       shift, and go to state 59
+    T_OR        shift, and go to state 60
+    T_OPERATOR  shift, and go to state 77
+    '+'         shift, and go to state 61
+    '-'         shift, and go to state 62
+    '*'         shift, and go to state 63
+    T_EQ        shift, and go to state 64
+    T_NE        shift, and go to state 65
+    T_LT        shift, and go to state 66
+    T_GT        shift, and go to state 67
+    T_LE        shift, and go to state 68
+    T_GE        shift, and go to state 69
+    '['         shift, and go to state 70
+
+
+State 52
+
+   61 expr: T_OPERATOR logical_expr .
+
+    $default  reduce using rule 61 (expr)
+
+
+State 53
+
+   38 array_access: expr . '[' expr ']'
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+   59     | '(' expr . ')'
+
+    T_AND  shift, and go to state 59
+    T_OR   shift, and go to state 60
+    '+'    shift, and go to state 61
+    '-'    shift, and go to state 62
+    '*'    shift, and go to state 63
+    T_EQ   shift, and go to state 64
+    T_NE   shift, and go to state 65
+    T_LT   shift, and go to state 66
+    T_GT   shift, and go to state 67
+    T_LE   shift, and go to state 68
+    T_GE   shift, and go to state 69
+    '['    shift, and go to state 70
+    ')'    shift, and go to state 78
+
+
+State 54
+
+   38 array_access: expr . '[' expr ']'
+   39 if_stmt: "if" expr . "then" stmt "else" stmt
+   40        | "if" expr . "then" stmt
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+
+    T_AND   shift, and go to state 59
+    T_OR    shift, and go to state 60
+    '+'     shift, and go to state 61
+    '-'     shift, and go to state 62
+    '*'     shift, and go to state 63
+    T_EQ    shift, and go to state 64
+    T_NE    shift, and go to state 65
+    T_LT    shift, and go to state 66
+    T_GT    shift, and go to state 67
+    T_LE    shift, and go to state 68
+    T_GE    shift, and go to state 69
+    '['     shift, and go to state 70
+    "then"  shift, and go to state 79
+
+
+State 55
+
+   38 array_access: expr . '[' expr ']'
+   41 while_stmt: "while" expr . "do" stmt
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+
+    T_AND  shift, and go to state 59
+    T_OR   shift, and go to state 60
+    '+'    shift, and go to state 61
+    '-'    shift, and go to state 62
+    '*'    shift, and go to state 63
+    T_EQ   shift, and go to state 64
+    T_NE   shift, and go to state 65
+    T_LT   shift, and go to state 66
+    T_GT   shift, and go to state 67
+    T_LE   shift, and go to state 68
+    T_GE   shift, and go to state 69
+    '['    shift, and go to state 70
+    "do"   shift, and go to state 80
+
+
+State 56
+
+   46 return_stmt: "return" T_SEPARATOR .
+
+    $default  reduce using rule 46 (return_stmt)
+
+
+State 57
+
+   38 array_access: expr . '[' expr ']'
+   45 return_stmt: "return" expr . T_SEPARATOR
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+
+    T_AND        shift, and go to state 59
+    T_OR         shift, and go to state 60
+    T_SEPARATOR  shift, and go to state 81
+    '+'          shift, and go to state 61
+    '-'          shift, and go to state 62
+    '*'          shift, and go to state 63
+    T_EQ         shift, and go to state 64
+    T_NE         shift, and go to state 65
+    T_LT         shift, and go to state 66
+    T_GT         shift, and go to state 67
+    T_LE         shift, and go to state 68
+    T_GE         shift, and go to state 69
+    '['          shift, and go to state 70
+
+
+State 58
+
+   35 assign_stmt: l_value T_SEPARATOR . expr
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 82
+    fun_call_expr  go to state 41
+
+
+State 59
+
+   51 expr: expr T_AND . expr
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 83
+    fun_call_expr  go to state 41
+
+
+State 60
+
+   52 expr: expr T_OR . expr
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 84
+    fun_call_expr  go to state 41
+
+
+State 61
+
+   48 expr: expr '+' . expr
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 85
+    fun_call_expr  go to state 41
+
+
+State 62
+
+   49 expr: expr '-' . expr
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 86
+    fun_call_expr  go to state 41
+
+
+State 63
+
+   50 expr: expr '*' . expr
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 87
+    fun_call_expr  go to state 41
+
+
+State 64
+
+   53 expr: expr T_EQ . expr
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 88
+    fun_call_expr  go to state 41
+
+
+State 65
+
+   54 expr: expr T_NE . expr
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 89
+    fun_call_expr  go to state 41
+
+
+State 66
+
+   55 expr: expr T_LT . expr
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 90
+    fun_call_expr  go to state 41
+
+
+State 67
+
+   56 expr: expr T_GT . expr
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 91
+    fun_call_expr  go to state 41
+
+
+State 68
+
+   57 expr: expr T_LE . expr
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 92
+    fun_call_expr  go to state 41
+
+
+State 69
+
+   58 expr: expr T_GE . expr
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 93
+    fun_call_expr  go to state 41
+
+
+State 70
+
+   38 array_access: expr '[' . expr ']'
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 94
+    fun_call_expr  go to state 41
+
+
+State 71
+
+   16 formal_param_list: formal_param_list ',' . formal_params
+
+    T_REF  shift, and go to state 95
+    T_ID   shift, and go to state 96
+
+    formal_params  go to state 97
+    param_list     go to state 98
+
+
+State 72
+
+   14 fun_declaration: T_FUN T_ID '(' formal_param_list ')' . ':' type ';'
+   21 fun_definition: T_FUN T_ID '(' formal_param_list ')' . ':' type declarations compound_stmt
+
+    ':'  shift, and go to state 99
+
+
+State 73
+
+    7 var_declaration: T_VAR var_list ':' type ';' .
+
+    $default  reduce using rule 7 (var_declaration)
+
+
+State 74
+
+   13 array_type: type '[' . T_NUM ']'
+
+    T_NUM  shift, and go to state 100
+
+
+State 75
+
+   42 fun_call_stmt: T_ID '(' actual_param_list . ')' T_SEPARATOR
+   44 actual_param_list: actual_param_list . ',' expr
+   64 fun_call_expr: T_ID '(' actual_param_list . ')'
+
+    ','  shift, and go to state 101
+    ')'  shift, and go to state 102
+
+
+State 76
+
+   64 fun_call_expr: T_ID '(' . actual_param_list ')'
+
+    $default  reduce using rule 43 (actual_param_list)
+
+    actual_param_list  go to state 103
+
+
+State 77
+
+   63 logical_expr: expr T_OPERATOR . expr
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 104
+    fun_call_expr  go to state 41
+
+
+State 78
+
+   59 expr: '(' expr ')' .
+
+    $default  reduce using rule 59 (expr)
+
+
+State 79
+
+   39 if_stmt: "if" expr "then" . stmt "else" stmt
+   40        | "if" expr "then" . stmt
+
+    T_FUN        shift, and go to state 4
+    T_VAR        shift, and go to state 5
+    T_ID         shift, and go to state 19
+    T_NUM        shift, and go to state 20
+    T_OPERATOR   shift, and go to state 21
+    T_SEPARATOR  shift, and go to state 22
+    '('          shift, and go to state 23
+    '{'          shift, and go to state 6
+    "if"         shift, and go to state 25
+    "while"      shift, and go to state 26
+    "return"     shift, and go to state 27
+
+    var_declaration  go to state 28
+    fun_declaration  go to state 29
+    fun_definition   go to state 30
+    compound_stmt    go to state 31
+    stmt             go to state 105
+    assign_stmt      go to state 33
+    l_value          go to state 34
+    array_access     go to state 35
+    if_stmt          go to state 36
+    while_stmt       go to state 37
+    fun_call_stmt    go to state 38
+    return_stmt      go to state 39
+    expr             go to state 40
+    fun_call_expr    go to state 41
+
+
+State 80
+
+   41 while_stmt: "while" expr "do" . stmt
+
+    T_FUN        shift, and go to state 4
+    T_VAR        shift, and go to state 5
+    T_ID         shift, and go to state 19
+    T_NUM        shift, and go to state 20
+    T_OPERATOR   shift, and go to state 21
+    T_SEPARATOR  shift, and go to state 22
+    '('          shift, and go to state 23
+    '{'          shift, and go to state 6
+    "if"         shift, and go to state 25
+    "while"      shift, and go to state 26
+    "return"     shift, and go to state 27
+
+    var_declaration  go to state 28
+    fun_declaration  go to state 29
+    fun_definition   go to state 30
+    compound_stmt    go to state 31
+    stmt             go to state 106
+    assign_stmt      go to state 33
+    l_value          go to state 34
+    array_access     go to state 35
+    if_stmt          go to state 36
+    while_stmt       go to state 37
+    fun_call_stmt    go to state 38
+    return_stmt      go to state 39
+    expr             go to state 40
+    fun_call_expr    go to state 41
+
+
+State 81
+
+   45 return_stmt: "return" expr T_SEPARATOR .
+
+    $default  reduce using rule 45 (return_stmt)
+
+
+State 82
+
+   35 assign_stmt: l_value T_SEPARATOR expr .
+   38 array_access: expr . '[' expr ']'
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+
+    T_AND  shift, and go to state 59
+    T_OR   shift, and go to state 60
+    '+'    shift, and go to state 61
+    '-'    shift, and go to state 62
+    '*'    shift, and go to state 63
+    T_EQ   shift, and go to state 64
+    T_NE   shift, and go to state 65
+    T_LT   shift, and go to state 66
+    T_GT   shift, and go to state 67
+    T_LE   shift, and go to state 68
+    T_GE   shift, and go to state 69
+    '['    shift, and go to state 70
+
+    $default  reduce using rule 35 (assign_stmt)
+
+
+State 83
+
+   38 array_access: expr . '[' expr ']'
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   51     | expr T_AND expr .
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+
+    T_EQ  shift, and go to state 64
+    T_NE  shift, and go to state 65
+    T_LT  shift, and go to state 66
+    T_GT  shift, and go to state 67
+    T_LE  shift, and go to state 68
+    T_GE  shift, and go to state 69
+    '['   shift, and go to state 70
+
+    '['       [reduce using rule 51 (expr)]
+    $default  reduce using rule 51 (expr)
+
+
+State 84
+
+   38 array_access: expr . '[' expr ']'
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   52     | expr T_OR expr .
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+
+    T_EQ  shift, and go to state 64
+    T_NE  shift, and go to state 65
+    T_LT  shift, and go to state 66
+    T_GT  shift, and go to state 67
+    T_LE  shift, and go to state 68
+    T_GE  shift, and go to state 69
+    '['   shift, and go to state 70
+
+    '['       [reduce using rule 52 (expr)]
+    $default  reduce using rule 52 (expr)
+
+
+State 85
+
+   38 array_access: expr . '[' expr ']'
+   48 expr: expr . '+' expr
+   48     | expr '+' expr .
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+
+    T_AND  shift, and go to state 59
+    T_OR   shift, and go to state 60
+    '*'    shift, and go to state 63
+    T_EQ   shift, and go to state 64
+    T_NE   shift, and go to state 65
+    T_LT   shift, and go to state 66
+    T_GT   shift, and go to state 67
+    T_LE   shift, and go to state 68
+    T_GE   shift, and go to state 69
+    '['    shift, and go to state 70
+
+    '['       [reduce using rule 48 (expr)]
+    $default  reduce using rule 48 (expr)
+
+
+State 86
+
+   38 array_access: expr . '[' expr ']'
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   49     | expr '-' expr .
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+
+    T_AND  shift, and go to state 59
+    T_OR   shift, and go to state 60
+    '*'    shift, and go to state 63
+    T_EQ   shift, and go to state 64
+    T_NE   shift, and go to state 65
+    T_LT   shift, and go to state 66
+    T_GT   shift, and go to state 67
+    T_LE   shift, and go to state 68
+    T_GE   shift, and go to state 69
+    '['    shift, and go to state 70
+
+    '['       [reduce using rule 49 (expr)]
+    $default  reduce using rule 49 (expr)
+
+
+State 87
+
+   38 array_access: expr . '[' expr ']'
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   50     | expr '*' expr .
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+
+    T_AND  shift, and go to state 59
+    T_OR   shift, and go to state 60
+    T_EQ   shift, and go to state 64
+    T_NE   shift, and go to state 65
+    T_LT   shift, and go to state 66
+    T_GT   shift, and go to state 67
+    T_LE   shift, and go to state 68
+    T_GE   shift, and go to state 69
+    '['    shift, and go to state 70
+
+    '['       [reduce using rule 50 (expr)]
+    $default  reduce using rule 50 (expr)
+
+
+State 88
+
+   38 array_access: expr . '[' expr ']'
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   53     | expr T_EQ expr .
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+
+    '['  shift, and go to state 70
+
+    '['       [reduce using rule 53 (expr)]
+    $default  reduce using rule 53 (expr)
+
+
+State 89
+
+   38 array_access: expr . '[' expr ']'
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   54     | expr T_NE expr .
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+
+    '['  shift, and go to state 70
+
+    '['       [reduce using rule 54 (expr)]
+    $default  reduce using rule 54 (expr)
+
+
+State 90
+
+   38 array_access: expr . '[' expr ']'
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   55     | expr T_LT expr .
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+
+    '['  shift, and go to state 70
+
+    '['       [reduce using rule 55 (expr)]
+    $default  reduce using rule 55 (expr)
+
+
+State 91
+
+   38 array_access: expr . '[' expr ']'
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   56     | expr T_GT expr .
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+
+    '['  shift, and go to state 70
+
+    '['       [reduce using rule 56 (expr)]
+    $default  reduce using rule 56 (expr)
+
+
+State 92
+
+   38 array_access: expr . '[' expr ']'
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   57     | expr T_LE expr .
+   58     | expr . T_GE expr
+
+    '['  shift, and go to state 70
+
+    '['       [reduce using rule 57 (expr)]
+    $default  reduce using rule 57 (expr)
+
+
+State 93
+
+   38 array_access: expr . '[' expr ']'
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+   58     | expr T_GE expr .
+
+    '['  shift, and go to state 70
+
+    '['       [reduce using rule 58 (expr)]
+    $default  reduce using rule 58 (expr)
+
+
+State 94
+
+   38 array_access: expr . '[' expr ']'
+   38             | expr '[' expr . ']'
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+
+    T_AND  shift, and go to state 59
+    T_OR   shift, and go to state 60
+    '+'    shift, and go to state 61
+    '-'    shift, and go to state 62
+    '*'    shift, and go to state 63
+    T_EQ   shift, and go to state 64
+    T_NE   shift, and go to state 65
+    T_LT   shift, and go to state 66
+    T_GT   shift, and go to state 67
+    T_LE   shift, and go to state 68
+    T_GE   shift, and go to state 69
+    '['    shift, and go to state 70
+    ']'    shift, and go to state 107
+
+
+State 95
+
+   17 formal_params: T_REF . param_list ':' type
+
+    T_ID  shift, and go to state 96
+
+    param_list  go to state 108
+
+
+State 96
+
+   19 param_list: T_ID .
+
+    $default  reduce using rule 19 (param_list)
+
+
+State 97
+
+   16 formal_param_list: formal_param_list ',' formal_params .
+
+    $default  reduce using rule 16 (formal_param_list)
+
+
+State 98
+
+   18 formal_params: param_list . ':' type
+   20 param_list: param_list . ',' T_ID
+
+    ':'  shift, and go to state 109
+    ','  shift, and go to state 110
+
+
+State 99
+
+   14 fun_declaration: T_FUN T_ID '(' formal_param_list ')' ':' . type ';'
+   21 fun_definition: T_FUN T_ID '(' formal_param_list ')' ':' . type declarations compound_stmt
+
+    T_CHAR  shift, and go to state 43
+    T_INT   shift, and go to state 44
+
+    type        go to state 111
+    array_type  go to state 46
+
+
+State 100
+
+   13 array_type: type '[' T_NUM . ']'
+
+    ']'  shift, and go to state 112
+
+
+State 101
+
+   44 actual_param_list: actual_param_list ',' . expr
+
+    T_ID        shift, and go to state 49
+    T_NUM       shift, and go to state 20
+    T_OPERATOR  shift, and go to state 21
+    '('         shift, and go to state 23
+
+    l_value        go to state 50
+    array_access   go to state 35
+    expr           go to state 113
+    fun_call_expr  go to state 41
+
+
+State 102
+
+   42 fun_call_stmt: T_ID '(' actual_param_list ')' . T_SEPARATOR
+   64 fun_call_expr: T_ID '(' actual_param_list ')' .
+
+    T_SEPARATOR  shift, and go to state 114
+
+    $default  reduce using rule 64 (fun_call_expr)
+
+
+State 103
+
+   44 actual_param_list: actual_param_list . ',' expr
+   64 fun_call_expr: T_ID '(' actual_param_list . ')'
+
+    ','  shift, and go to state 101
+    ')'  shift, and go to state 115
+
+
+State 104
+
+   38 array_access: expr . '[' expr ']'
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+   63 logical_expr: expr T_OPERATOR expr .
+
+    T_AND  shift, and go to state 59
+    T_OR   shift, and go to state 60
+    '+'    shift, and go to state 61
+    '-'    shift, and go to state 62
+    '*'    shift, and go to state 63
+    T_EQ   shift, and go to state 64
+    T_NE   shift, and go to state 65
+    T_LT   shift, and go to state 66
+    T_GT   shift, and go to state 67
+    T_LE   shift, and go to state 68
+    T_GE   shift, and go to state 69
+    '['    shift, and go to state 70
+
+    '['       [reduce using rule 63 (logical_expr)]
+    $default  reduce using rule 63 (logical_expr)
+
+
+State 105
+
+   39 if_stmt: "if" expr "then" stmt . "else" stmt
+   40        | "if" expr "then" stmt .
+
+    "else"  shift, and go to state 116
+
+    "else"    [reduce using rule 40 (if_stmt)]
+    $default  reduce using rule 40 (if_stmt)
+
+
+State 106
+
+   41 while_stmt: "while" expr "do" stmt .
+
+    $default  reduce using rule 41 (while_stmt)
+
+
+State 107
+
+   38 array_access: expr '[' expr ']' .
+
+    $default  reduce using rule 38 (array_access)
+
+
+State 108
+
+   17 formal_params: T_REF param_list . ':' type
+   20 param_list: param_list . ',' T_ID
+
+    ':'  shift, and go to state 117
+    ','  shift, and go to state 110
+
+
+State 109
+
+   18 formal_params: param_list ':' . type
+
+    T_CHAR  shift, and go to state 43
+    T_INT   shift, and go to state 44
+
+    type        go to state 118
+    array_type  go to state 46
+
+
+State 110
+
+   20 param_list: param_list ',' . T_ID
+
+    T_ID  shift, and go to state 119
+
+
+State 111
+
+   13 array_type: type . '[' T_NUM ']'
+   14 fun_declaration: T_FUN T_ID '(' formal_param_list ')' ':' type . ';'
+   21 fun_definition: T_FUN T_ID '(' formal_param_list ')' ':' type . declarations compound_stmt
+
+    ';'  shift, and go to state 120
+    '['  shift, and go to state 74
+
+    $default  reduce using rule 2 (declarations)
+
+    declarations  go to state 121
+
+
+State 112
+
+   13 array_type: type '[' T_NUM ']' .
+
+    $default  reduce using rule 13 (array_type)
+
+
+State 113
+
+   38 array_access: expr . '[' expr ']'
+   44 actual_param_list: actual_param_list ',' expr .
+   48 expr: expr . '+' expr
+   49     | expr . '-' expr
+   50     | expr . '*' expr
+   51     | expr . T_AND expr
+   52     | expr . T_OR expr
+   53     | expr . T_EQ expr
+   54     | expr . T_NE expr
+   55     | expr . T_LT expr
+   56     | expr . T_GT expr
+   57     | expr . T_LE expr
+   58     | expr . T_GE expr
+
+    T_AND  shift, and go to state 59
+    T_OR   shift, and go to state 60
+    '+'    shift, and go to state 61
+    '-'    shift, and go to state 62
+    '*'    shift, and go to state 63
+    T_EQ   shift, and go to state 64
+    T_NE   shift, and go to state 65
+    T_LT   shift, and go to state 66
+    T_GT   shift, and go to state 67
+    T_LE   shift, and go to state 68
+    T_GE   shift, and go to state 69
+    '['    shift, and go to state 70
+
+    $default  reduce using rule 44 (actual_param_list)
+
+
+State 114
+
+   42 fun_call_stmt: T_ID '(' actual_param_list ')' T_SEPARATOR .
+
+    $default  reduce using rule 42 (fun_call_stmt)
+
+
+State 115
+
+   64 fun_call_expr: T_ID '(' actual_param_list ')' .
+
+    $default  reduce using rule 64 (fun_call_expr)
+
+
+State 116
+
+   39 if_stmt: "if" expr "then" stmt "else" . stmt
+
+    T_FUN        shift, and go to state 4
+    T_VAR        shift, and go to state 5
+    T_ID         shift, and go to state 19
+    T_NUM        shift, and go to state 20
+    T_OPERATOR   shift, and go to state 21
+    T_SEPARATOR  shift, and go to state 22
+    '('          shift, and go to state 23
+    '{'          shift, and go to state 6
+    "if"         shift, and go to state 25
+    "while"      shift, and go to state 26
+    "return"     shift, and go to state 27
+
+    var_declaration  go to state 28
+    fun_declaration  go to state 29
+    fun_definition   go to state 30
+    compound_stmt    go to state 31
+    stmt             go to state 122
+    assign_stmt      go to state 33
+    l_value          go to state 34
+    array_access     go to state 35
+    if_stmt          go to state 36
+    while_stmt       go to state 37
+    fun_call_stmt    go to state 38
+    return_stmt      go to state 39
+    expr             go to state 40
+    fun_call_expr    go to state 41
+
+
+State 117
+
+   17 formal_params: T_REF param_list ':' . type
+
+    T_CHAR  shift, and go to state 43
+    T_INT   shift, and go to state 44
+
+    type        go to state 123
+    array_type  go to state 46
+
+
+State 118
+
+   13 array_type: type . '[' T_NUM ']'
+   18 formal_params: param_list ':' type .
+
+    '['  shift, and go to state 74
+
+    $default  reduce using rule 18 (formal_params)
+
+
+State 119
+
+   20 param_list: param_list ',' T_ID .
+
+    $default  reduce using rule 20 (param_list)
+
+
+State 120
+
+   14 fun_declaration: T_FUN T_ID '(' formal_param_list ')' ':' type ';' .
+
+    $default  reduce using rule 14 (fun_declaration)
+
+
+State 121
+
+    3 declarations: declarations . declaration
+   21 fun_definition: T_FUN T_ID '(' formal_param_list ')' ':' type declarations . compound_stmt
+
+    T_FUN  shift, and go to state 4
+    T_VAR  shift, and go to state 5
+    '{'    shift, and go to state 6
+
+    declaration      go to state 7
+    var_declaration  go to state 8
+    fun_declaration  go to state 9
+    fun_definition   go to state 10
+    compound_stmt    go to state 124
+
+
+State 122
+
+   39 if_stmt: "if" expr "then" stmt "else" stmt .
+
+    $default  reduce using rule 39 (if_stmt)
+
+
+State 123
+
+   13 array_type: type . '[' T_NUM ']'
+   17 formal_params: T_REF param_list ':' type .
+
+    '['  shift, and go to state 74
+
+    $default  reduce using rule 17 (formal_params)
+
+
+State 124
+
+   21 fun_definition: T_FUN T_ID '(' formal_param_list ')' ':' type declarations compound_stmt .
+
+    $default  reduce using rule 21 (fun_definition)

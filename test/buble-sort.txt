@@ -1,6 +1,6 @@
 $$ dgegdiyeg 
-sssw
-wsw$'declarationd
+    sssw
+    wsw$'declarationd
 $$ 
 fun main () : nothing
 

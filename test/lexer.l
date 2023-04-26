@@ -69,10 +69,11 @@ separator   [\(\)\[\]\{\},;:]|<-
 \$.*\n          { }
 \$\$            { BEGIN(COMMENT); }
 
+
+<COMMENT>\$\$     { BEGIN(INITIAL); }
 <COMMENT>[^\$\n]+ { }
 <COMMENT>\$[^$]   { }
 <COMMENT>\n       { }
-<COMMENT>\$\$     { BEGIN(INITIAL); }
 <COMMENT>.        { } 
 
 .               { printf("Illegal token\n"); exit(1); }

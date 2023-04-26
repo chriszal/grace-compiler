@@ -368,10 +368,10 @@ static const flex_int16_t yy_accept[96] =
         0,    0,    0,    0,   34,   32,   24,   24,   32,   22,
        32,   32,   23,   19,   22,   22,   18,   18,   18,   18,
        18,   18,   18,   18,   18,   18,   18,   18,   18,   18,
-       27,   29,   31,   24,    0,   21,    0,    0,   25,   26,
+       28,   30,   31,   24,    0,   21,    0,    0,   25,   26,
         0,    0,   19,   23,   22,   18,   18,   18,   18,    4,
        18,   18,    7,   18,   18,   18,   12,   18,   18,   18,
-       18,   27,   28,   30,    0,   20,    0,    1,   18,    3,
+       18,   28,   29,   27,    0,   20,    0,    1,   18,    3,
        18,    6,    8,    9,   10,   13,   18,   18,   16,   18,
         0,    0,    2,    5,   18,   18,   15,   18,   18,   18,
        17,   18,   14,   11,    0
@@ -964,39 +964,39 @@ YY_RULE_SETUP
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 72 "lexer.l"
-{ }
+#line 73 "lexer.l"
+{ BEGIN(INITIAL); }
 	YY_BREAK
 case 28:
-/* rule 28 can match eol */
 YY_RULE_SETUP
-#line 73 "lexer.l"
+#line 74 "lexer.l"
 { }
 	YY_BREAK
 case 29:
 /* rule 29 can match eol */
 YY_RULE_SETUP
-#line 74 "lexer.l"
+#line 75 "lexer.l"
 { }
 	YY_BREAK
 case 30:
+/* rule 30 can match eol */
 YY_RULE_SETUP
-#line 75 "lexer.l"
-{ BEGIN(INITIAL); }
+#line 76 "lexer.l"
+{ }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 76 "lexer.l"
+#line 77 "lexer.l"
 { } 
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 78 "lexer.l"
+#line 79 "lexer.l"
 { printf("Illegal token\n"); exit(1); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 80 "lexer.l"
+#line 81 "lexer.l"
 ECHO;
 	YY_BREAK
 #line 1003 "lex.yy.c"
@@ -2005,7 +2005,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 80 "lexer.l"
+#line 81 "lexer.l"
 
 
 int main() {
