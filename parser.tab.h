@@ -71,7 +71,8 @@ extern int yydebug;
     T_FIXED_CHAR = 277,
     T_STR = 278,
     T_OPERATOR = 279,
-    T_SEPARATOR = 280
+    T_SEPARATOR = 280,
+    UMINUS = 281
   };
 #endif
 

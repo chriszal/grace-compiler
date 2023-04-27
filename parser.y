@@ -17,7 +17,7 @@ void yyerror(const char *msg);
 %left T_MOD T_DIV
 %left '+' '-'
 %left '*'
-%left T_ELSE
+%nonassoc T_ELSE
 %nonassoc UMINUS
 %nonassoc T_SEPARATOR
 
@@ -100,13 +100,9 @@ stmt :
     | l_value "<-" expr ';'
     | block
     | func_call ';'
-    | T_IF cond T_THEN stmt if_else_opt
+    | T_IF cond T_THEN stmt '[' T_ELSE stmt ']'
     | T_WHILE cond T_DO stmt
     | T_RETURN expr_opt ';'
-    ;
-
-if_else_opt :
-    | T_ELSE stmt
     ;
 
 

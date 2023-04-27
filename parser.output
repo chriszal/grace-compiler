@@ -1,6 +1,3 @@
-State 109 conflicts: 1 shift/reduce
-
-
 Grammar
 
     0 $accept: program $end
@@ -51,93 +48,90 @@ Grammar
    29     | l_value "<-" expr ';'
    30     | block
    31     | func_call ';'
-   32     | T_IF cond T_THEN stmt if_else_opt
+   32     | T_IF cond T_THEN stmt '[' T_ELSE stmt ']'
    33     | T_WHILE cond T_DO stmt
    34     | T_RETURN expr_opt ';'
 
-   35 if_else_opt: %empty
-   36            | T_ELSE stmt
+   35 expr_opt: %empty
+   36         | expr
 
-   37 expr_opt: %empty
-   38         | expr
+   37 block: '{' stmt_list '}'
 
-   39 block: '{' stmt_list '}'
+   38 stmt_list: %empty
+   39          | stmt_list stmt
 
-   40 stmt_list: %empty
-   41          | stmt_list stmt
+   40 func_call: T_ID '(' expr_list_opt ')'
 
-   42 func_call: T_ID '(' expr_list_opt ')'
+   41 expr_list_opt: %empty
+   42              | expr_list
 
-   43 expr_list_opt: %empty
-   44              | expr_list
+   43 expr_list: expr
+   44          | expr_list ',' expr
 
-   45 expr_list: expr
-   46          | expr_list ',' expr
+   45 l_value: T_ID
+   46        | T_STR
+   47        | l_value '[' expr ']'
 
-   47 l_value: T_ID
-   48        | T_STR
-   49        | l_value '[' expr ']'
+   48 expr: T_NUM
+   49     | T_FIXED_CHAR
+   50     | l_value
+   51     | func_call
+   52     | '(' expr ')'
+   53     | '+' expr
+   54     | '-' expr
+   55     | expr '+' expr
+   56     | expr '-' expr
+   57     | expr '*' expr
+   58     | expr T_DIV expr
+   59     | expr T_MOD expr
+   60     | expr T_SEPARATOR
 
-   50 expr: T_NUM
-   51     | T_FIXED_CHAR
-   52     | l_value
-   53     | func_call
-   54     | '(' expr ')'
-   55     | '+' expr
-   56     | '-' expr
-   57     | expr '+' expr
-   58     | expr '-' expr
-   59     | expr '*' expr
-   60     | expr T_DIV expr
-   61     | expr T_MOD expr
-   62     | expr T_SEPARATOR
-
-   63 cond: '(' cond ')'
-   64     | T_NOT cond
-   65     | cond T_AND cond
-   66     | cond T_OR cond
-   67     | expr T_OPERATOR expr
+   61 cond: '(' cond ')'
+   62     | T_NOT cond
+   63     | cond T_AND cond
+   64     | cond T_OR cond
+   65     | expr T_OPERATOR expr
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
-    '(' (40) 4 42 54 63
-    ')' (41) 4 42 54 63
-    '*' (42) 59
-    '+' (43) 55 57
-    ',' (44) 11 46
-    '-' (45) 56 58
+    '(' (40) 4 40 52 61
+    ')' (41) 4 40 52 61
+    '*' (42) 57
+    '+' (43) 53 55
+    ',' (44) 11 44
+    '-' (45) 54 56
     ':' (58) 4 7 26
     ';' (59) 6 26 27 28 29 31 34
-    '[' (91) 15 19 20 49
-    ']' (93) 15 19 20 49
-    '{' (123) 39
-    '}' (125) 39
+    '[' (91) 15 19 20 32 47
+    ']' (93) 15 19 20 32 47
+    '{' (123) 37
+    '}' (125) 37
     error (256)
-    T_AND (258) 65
+    T_AND (258) 63
     T_CHAR (259) 13
-    T_DIV (260) 60
+    T_DIV (260) 58
     T_DO (261) 33
-    T_ELSE (262) 36
+    T_ELSE (262) 32
     T_FUN (263) 4
     T_IF (264) 32
     T_INT (265) 12
-    T_MOD (266) 61
-    T_NOT (267) 64
+    T_MOD (266) 59
+    T_NOT (267) 62
     T_NOTHING (268) 17
-    T_OR (269) 66
+    T_OR (269) 64
     T_REF (270) 9
     T_RETURN (271) 34
     T_THEN (272) 32
     T_VAR (273) 26
     T_WHILE (274) 33
-    T_ID (275) 4 10 11 42 47
-    T_NUM (276) 15 20 50
-    T_FIXED_CHAR (277) 51
-    T_STR (278) 48
-    T_OPERATOR (279) 67
-    T_SEPARATOR (280) 62
+    T_ID (275) 4 10 11 40 45
+    T_NUM (276) 15 20 48
+    T_FIXED_CHAR (277) 49
+    T_STR (278) 46
+    T_OPERATOR (279) 65
+    T_SEPARATOR (280) 60
     UMINUS (281)
     "<-" (282) 29
 
@@ -193,37 +187,34 @@ Nonterminals, with rules where they appear
         on right: 24
     stmt (56)
         on left: 28 29 30 31 32 33 34
-        on right: 32 33 36 41
-    if_else_opt (57)
+        on right: 32 33 39
+    expr_opt (57)
         on left: 35 36
-        on right: 32
-    expr_opt (58)
-        on left: 37 38
         on right: 34
-    block (59)
-        on left: 39
+    block (58)
+        on left: 37
         on right: 3 30
-    stmt_list (60)
-        on left: 40 41
-        on right: 39 41
-    func_call (61)
-        on left: 42
-        on right: 31 53
-    expr_list_opt (62)
+    stmt_list (59)
+        on left: 38 39
+        on right: 37 39
+    func_call (60)
+        on left: 40
+        on right: 31 51
+    expr_list_opt (61)
+        on left: 41 42
+        on right: 40
+    expr_list (62)
         on left: 43 44
-        on right: 42
-    expr_list (63)
-        on left: 45 46
-        on right: 44 46
-    l_value (64)
-        on left: 47 48 49
-        on right: 29 49 52
-    expr (65)
-        on left: 50 51 52 53 54 55 56 57 58 59 60 61 62
-        on right: 29 38 45 46 49 54 55 56 57 58 59 60 61 62 67
-    cond (66)
-        on left: 63 64 65 66 67
-        on right: 32 33 63 64 65 66
+        on right: 42 44
+    l_value (63)
+        on left: 45 46 47
+        on right: 29 47 50
+    expr (64)
+        on left: 48 49 50 51 52 53 54 55 56 57 58 59 60
+        on right: 29 36 43 44 47 52 53 54 55 56 57 58 59 60 65
+    cond (65)
+        on left: 61 62 63 64 65
+        on right: 32 33 61 62 63 64
 
 
 State 0
@@ -325,9 +316,9 @@ State 9
 
 State 10
 
-   39 block: '{' . stmt_list '}'
+   37 block: '{' . stmt_list '}'
 
-    $default  reduce using rule 40 (stmt_list)
+    $default  reduce using rule 38 (stmt_list)
 
     stmt_list  go to state 23
 
@@ -429,8 +420,8 @@ State 22
 
 State 23
 
-   39 block: '{' stmt_list . '}'
-   41 stmt_list: stmt_list . stmt
+   37 block: '{' stmt_list . '}'
+   39 stmt_list: stmt_list . stmt
 
     T_IF      shift, and go to state 30
     T_RETURN  shift, and go to state 31
@@ -502,7 +493,7 @@ State 29
 
 State 30
 
-   32 stmt: T_IF . cond T_THEN stmt if_else_opt
+   32 stmt: T_IF . cond T_THEN stmt '[' T_ELSE stmt ']'
 
     T_NOT         shift, and go to state 49
     T_ID          shift, and go to state 33
@@ -531,7 +522,7 @@ State 31
     '-'           shift, and go to state 53
     '('           shift, and go to state 59
 
-    $default  reduce using rule 37 (expr_opt)
+    $default  reduce using rule 35 (expr_opt)
 
     expr_opt   go to state 60
     func_call  go to state 55
@@ -560,19 +551,19 @@ State 32
 
 State 33
 
-   42 func_call: T_ID . '(' expr_list_opt ')'
-   47 l_value: T_ID .
+   40 func_call: T_ID . '(' expr_list_opt ')'
+   45 l_value: T_ID .
 
     '('  shift, and go to state 63
 
-    $default  reduce using rule 47 (l_value)
+    $default  reduce using rule 45 (l_value)
 
 
 State 34
 
-   48 l_value: T_STR .
+   46 l_value: T_STR .
 
-    $default  reduce using rule 48 (l_value)
+    $default  reduce using rule 46 (l_value)
 
 
 State 35
@@ -584,16 +575,16 @@ State 35
 
 State 36
 
-   39 block: '{' stmt_list '}' .
+   37 block: '{' stmt_list '}' .
 
-    $default  reduce using rule 39 (block)
+    $default  reduce using rule 37 (block)
 
 
 State 37
 
-   41 stmt_list: stmt_list stmt .
+   39 stmt_list: stmt_list stmt .
 
-    $default  reduce using rule 41 (stmt_list)
+    $default  reduce using rule 39 (stmt_list)
 
 
 State 38
@@ -613,7 +604,7 @@ State 39
 State 40
 
    29 stmt: l_value . "<-" expr ';'
-   49 l_value: l_value . '[' expr ']'
+   47 l_value: l_value . '[' expr ']'
 
     '['   shift, and go to state 65
     "<-"  shift, and go to state 66
@@ -689,7 +680,7 @@ State 48
 
 State 49
 
-   64 cond: T_NOT . cond
+   62 cond: T_NOT . cond
 
     T_NOT         shift, and go to state 49
     T_ID          shift, and go to state 33
@@ -708,21 +699,21 @@ State 49
 
 State 50
 
-   50 expr: T_NUM .
+   48 expr: T_NUM .
 
-    $default  reduce using rule 50 (expr)
+    $default  reduce using rule 48 (expr)
 
 
 State 51
 
-   51 expr: T_FIXED_CHAR .
+   49 expr: T_FIXED_CHAR .
 
-    $default  reduce using rule 51 (expr)
+    $default  reduce using rule 49 (expr)
 
 
 State 52
 
-   55 expr: '+' . expr
+   53 expr: '+' . expr
 
     T_ID          shift, and go to state 33
     T_NUM         shift, and go to state 50
@@ -739,7 +730,7 @@ State 52
 
 State 53
 
-   56 expr: '-' . expr
+   54 expr: '-' . expr
 
     T_ID          shift, and go to state 33
     T_NUM         shift, and go to state 50
@@ -756,8 +747,8 @@ State 53
 
 State 54
 
-   54 expr: '(' . expr ')'
-   63 cond: '(' . cond ')'
+   52 expr: '(' . expr ')'
+   61 cond: '(' . cond ')'
 
     T_NOT         shift, and go to state 49
     T_ID          shift, and go to state 33
@@ -776,30 +767,30 @@ State 54
 
 State 55
 
-   53 expr: func_call .
+   51 expr: func_call .
 
-    $default  reduce using rule 53 (expr)
+    $default  reduce using rule 51 (expr)
 
 
 State 56
 
-   49 l_value: l_value . '[' expr ']'
-   52 expr: l_value .
+   47 l_value: l_value . '[' expr ']'
+   50 expr: l_value .
 
     '['  shift, and go to state 65
 
-    $default  reduce using rule 52 (expr)
+    $default  reduce using rule 50 (expr)
 
 
 State 57
 
-   57 expr: expr . '+' expr
-   58     | expr . '-' expr
-   59     | expr . '*' expr
-   60     | expr . T_DIV expr
-   61     | expr . T_MOD expr
-   62     | expr . T_SEPARATOR
-   67 cond: expr . T_OPERATOR expr
+   55 expr: expr . '+' expr
+   56     | expr . '-' expr
+   57     | expr . '*' expr
+   58     | expr . T_DIV expr
+   59     | expr . T_MOD expr
+   60     | expr . T_SEPARATOR
+   65 cond: expr . T_OPERATOR expr
 
     T_DIV        shift, and go to state 79
     T_MOD        shift, and go to state 80
@@ -812,9 +803,9 @@ State 57
 
 State 58
 
-   32 stmt: T_IF cond . T_THEN stmt if_else_opt
-   65 cond: cond . T_AND cond
-   66     | cond . T_OR cond
+   32 stmt: T_IF cond . T_THEN stmt '[' T_ELSE stmt ']'
+   63 cond: cond . T_AND cond
+   64     | cond . T_OR cond
 
     T_AND   shift, and go to state 86
     T_OR    shift, and go to state 87
@@ -823,7 +814,7 @@ State 58
 
 State 59
 
-   54 expr: '(' . expr ')'
+   52 expr: '(' . expr ')'
 
     T_ID          shift, and go to state 33
     T_NUM         shift, and go to state 50
@@ -847,13 +838,13 @@ State 60
 
 State 61
 
-   38 expr_opt: expr .
-   57 expr: expr . '+' expr
-   58     | expr . '-' expr
-   59     | expr . '*' expr
-   60     | expr . T_DIV expr
-   61     | expr . T_MOD expr
-   62     | expr . T_SEPARATOR
+   36 expr_opt: expr .
+   55 expr: expr . '+' expr
+   56     | expr . '-' expr
+   57     | expr . '*' expr
+   58     | expr . T_DIV expr
+   59     | expr . T_MOD expr
+   60     | expr . T_SEPARATOR
 
     T_DIV        shift, and go to state 79
     T_MOD        shift, and go to state 80
@@ -862,14 +853,14 @@ State 61
     '-'          shift, and go to state 84
     '*'          shift, and go to state 85
 
-    $default  reduce using rule 38 (expr_opt)
+    $default  reduce using rule 36 (expr_opt)
 
 
 State 62
 
    33 stmt: T_WHILE cond . T_DO stmt
-   65 cond: cond . T_AND cond
-   66     | cond . T_OR cond
+   63 cond: cond . T_AND cond
+   64     | cond . T_OR cond
 
     T_AND  shift, and go to state 86
     T_DO   shift, and go to state 91
@@ -878,7 +869,7 @@ State 62
 
 State 63
 
-   42 func_call: T_ID '(' . expr_list_opt ')'
+   40 func_call: T_ID '(' . expr_list_opt ')'
 
     T_ID          shift, and go to state 33
     T_NUM         shift, and go to state 50
@@ -888,7 +879,7 @@ State 63
     '-'           shift, and go to state 53
     '('           shift, and go to state 59
 
-    $default  reduce using rule 43 (expr_list_opt)
+    $default  reduce using rule 41 (expr_list_opt)
 
     func_call      go to state 55
     expr_list_opt  go to state 92
@@ -906,7 +897,7 @@ State 64
 
 State 65
 
-   49 l_value: l_value '[' . expr ']'
+   47 l_value: l_value '[' . expr ']'
 
     T_ID          shift, and go to state 33
     T_NUM         shift, and go to state 50
@@ -993,53 +984,53 @@ State 73
 
 State 74
 
-   64 cond: T_NOT cond .
-   65     | cond . T_AND cond
-   66     | cond . T_OR cond
+   62 cond: T_NOT cond .
+   63     | cond . T_AND cond
+   64     | cond . T_OR cond
 
-    $default  reduce using rule 64 (cond)
+    $default  reduce using rule 62 (cond)
 
 
 State 75
 
-   55 expr: '+' expr .
-   57     | expr . '+' expr
-   58     | expr . '-' expr
-   59     | expr . '*' expr
-   60     | expr . T_DIV expr
-   61     | expr . T_MOD expr
-   62     | expr . T_SEPARATOR
+   53 expr: '+' expr .
+   55     | expr . '+' expr
+   56     | expr . '-' expr
+   57     | expr . '*' expr
+   58     | expr . T_DIV expr
+   59     | expr . T_MOD expr
+   60     | expr . T_SEPARATOR
 
     T_SEPARATOR  shift, and go to state 82
 
-    $default  reduce using rule 55 (expr)
+    $default  reduce using rule 53 (expr)
 
 
 State 76
 
-   56 expr: '-' expr .
-   57     | expr . '+' expr
-   58     | expr . '-' expr
-   59     | expr . '*' expr
-   60     | expr . T_DIV expr
-   61     | expr . T_MOD expr
-   62     | expr . T_SEPARATOR
+   54 expr: '-' expr .
+   55     | expr . '+' expr
+   56     | expr . '-' expr
+   57     | expr . '*' expr
+   58     | expr . T_DIV expr
+   59     | expr . T_MOD expr
+   60     | expr . T_SEPARATOR
 
     T_SEPARATOR  shift, and go to state 82
 
-    $default  reduce using rule 56 (expr)
+    $default  reduce using rule 54 (expr)
 
 
 State 77
 
-   54 expr: '(' expr . ')'
-   57     | expr . '+' expr
-   58     | expr . '-' expr
-   59     | expr . '*' expr
-   60     | expr . T_DIV expr
-   61     | expr . T_MOD expr
-   62     | expr . T_SEPARATOR
-   67 cond: expr . T_OPERATOR expr
+   52 expr: '(' expr . ')'
+   55     | expr . '+' expr
+   56     | expr . '-' expr
+   57     | expr . '*' expr
+   58     | expr . T_DIV expr
+   59     | expr . T_MOD expr
+   60     | expr . T_SEPARATOR
+   65 cond: expr . T_OPERATOR expr
 
     T_DIV        shift, and go to state 79
     T_MOD        shift, and go to state 80
@@ -1053,9 +1044,9 @@ State 77
 
 State 78
 
-   63 cond: '(' cond . ')'
-   65     | cond . T_AND cond
-   66     | cond . T_OR cond
+   61 cond: '(' cond . ')'
+   63     | cond . T_AND cond
+   64     | cond . T_OR cond
 
     T_AND  shift, and go to state 86
     T_OR   shift, and go to state 87
@@ -1064,7 +1055,7 @@ State 78
 
 State 79
 
-   60 expr: expr T_DIV . expr
+   58 expr: expr T_DIV . expr
 
     T_ID          shift, and go to state 33
     T_NUM         shift, and go to state 50
@@ -1081,7 +1072,7 @@ State 79
 
 State 80
 
-   61 expr: expr T_MOD . expr
+   59 expr: expr T_MOD . expr
 
     T_ID          shift, and go to state 33
     T_NUM         shift, and go to state 50
@@ -1098,7 +1089,7 @@ State 80
 
 State 81
 
-   67 cond: expr T_OPERATOR . expr
+   65 cond: expr T_OPERATOR . expr
 
     T_ID          shift, and go to state 33
     T_NUM         shift, and go to state 50
@@ -1115,14 +1106,14 @@ State 81
 
 State 82
 
-   62 expr: expr T_SEPARATOR .
+   60 expr: expr T_SEPARATOR .
 
-    $default  reduce using rule 62 (expr)
+    $default  reduce using rule 60 (expr)
 
 
 State 83
 
-   57 expr: expr '+' . expr
+   55 expr: expr '+' . expr
 
     T_ID          shift, and go to state 33
     T_NUM         shift, and go to state 50
@@ -1139,7 +1130,7 @@ State 83
 
 State 84
 
-   58 expr: expr '-' . expr
+   56 expr: expr '-' . expr
 
     T_ID          shift, and go to state 33
     T_NUM         shift, and go to state 50
@@ -1156,7 +1147,7 @@ State 84
 
 State 85
 
-   59 expr: expr '*' . expr
+   57 expr: expr '*' . expr
 
     T_ID          shift, and go to state 33
     T_NUM         shift, and go to state 50
@@ -1173,7 +1164,7 @@ State 85
 
 State 86
 
-   65 cond: cond T_AND . cond
+   63 cond: cond T_AND . cond
 
     T_NOT         shift, and go to state 49
     T_ID          shift, and go to state 33
@@ -1192,7 +1183,7 @@ State 86
 
 State 87
 
-   66 cond: cond T_OR . cond
+   64 cond: cond T_OR . cond
 
     T_NOT         shift, and go to state 49
     T_ID          shift, and go to state 33
@@ -1211,7 +1202,7 @@ State 87
 
 State 88
 
-   32 stmt: T_IF cond T_THEN . stmt if_else_opt
+   32 stmt: T_IF cond T_THEN . stmt '[' T_ELSE stmt ']'
 
     T_IF      shift, and go to state 30
     T_RETURN  shift, and go to state 31
@@ -1229,13 +1220,13 @@ State 88
 
 State 89
 
-   54 expr: '(' expr . ')'
-   57     | expr . '+' expr
-   58     | expr . '-' expr
-   59     | expr . '*' expr
-   60     | expr . T_DIV expr
-   61     | expr . T_MOD expr
-   62     | expr . T_SEPARATOR
+   52 expr: '(' expr . ')'
+   55     | expr . '+' expr
+   56     | expr . '-' expr
+   57     | expr . '*' expr
+   58     | expr . T_DIV expr
+   59     | expr . T_MOD expr
+   60     | expr . T_SEPARATOR
 
     T_DIV        shift, and go to state 79
     T_MOD        shift, and go to state 80
@@ -1273,30 +1264,30 @@ State 91
 
 State 92
 
-   42 func_call: T_ID '(' expr_list_opt . ')'
+   40 func_call: T_ID '(' expr_list_opt . ')'
 
     ')'  shift, and go to state 111
 
 
 State 93
 
-   44 expr_list_opt: expr_list .
-   46 expr_list: expr_list . ',' expr
+   42 expr_list_opt: expr_list .
+   44 expr_list: expr_list . ',' expr
 
     ','  shift, and go to state 112
 
-    $default  reduce using rule 44 (expr_list_opt)
+    $default  reduce using rule 42 (expr_list_opt)
 
 
 State 94
 
-   45 expr_list: expr .
-   57 expr: expr . '+' expr
-   58     | expr . '-' expr
-   59     | expr . '*' expr
-   60     | expr . T_DIV expr
-   61     | expr . T_MOD expr
-   62     | expr . T_SEPARATOR
+   43 expr_list: expr .
+   55 expr: expr . '+' expr
+   56     | expr . '-' expr
+   57     | expr . '*' expr
+   58     | expr . T_DIV expr
+   59     | expr . T_MOD expr
+   60     | expr . T_SEPARATOR
 
     T_DIV        shift, and go to state 79
     T_MOD        shift, and go to state 80
@@ -1305,18 +1296,18 @@ State 94
     '-'          shift, and go to state 84
     '*'          shift, and go to state 85
 
-    $default  reduce using rule 45 (expr_list)
+    $default  reduce using rule 43 (expr_list)
 
 
 State 95
 
-   49 l_value: l_value '[' expr . ']'
-   57 expr: expr . '+' expr
-   58     | expr . '-' expr
-   59     | expr . '*' expr
-   60     | expr . T_DIV expr
-   61     | expr . T_MOD expr
-   62     | expr . T_SEPARATOR
+   47 l_value: l_value '[' expr . ']'
+   55 expr: expr . '+' expr
+   56     | expr . '-' expr
+   57     | expr . '*' expr
+   58     | expr . T_DIV expr
+   59     | expr . T_MOD expr
+   60     | expr . T_SEPARATOR
 
     T_DIV        shift, and go to state 79
     T_MOD        shift, and go to state 80
@@ -1330,12 +1321,12 @@ State 95
 State 96
 
    29 stmt: l_value "<-" expr . ';'
-   57 expr: expr . '+' expr
-   58     | expr . '-' expr
-   59     | expr . '*' expr
-   60     | expr . T_DIV expr
-   61     | expr . T_MOD expr
-   62     | expr . T_SEPARATOR
+   55 expr: expr . '+' expr
+   56     | expr . '-' expr
+   57     | expr . '*' expr
+   58     | expr . T_DIV expr
+   59     | expr . T_MOD expr
+   60     | expr . T_SEPARATOR
 
     T_DIV        shift, and go to state 79
     T_MOD        shift, and go to state 80
@@ -1364,63 +1355,63 @@ State 98
 
 State 99
 
-   54 expr: '(' expr ')' .
+   52 expr: '(' expr ')' .
 
-    $default  reduce using rule 54 (expr)
+    $default  reduce using rule 52 (expr)
 
 
 State 100
 
-   63 cond: '(' cond ')' .
+   61 cond: '(' cond ')' .
 
-    $default  reduce using rule 63 (cond)
+    $default  reduce using rule 61 (cond)
 
 
 State 101
 
-   57 expr: expr . '+' expr
-   58     | expr . '-' expr
-   59     | expr . '*' expr
-   60     | expr . T_DIV expr
-   60     | expr T_DIV expr .
-   61     | expr . T_MOD expr
-   62     | expr . T_SEPARATOR
+   55 expr: expr . '+' expr
+   56     | expr . '-' expr
+   57     | expr . '*' expr
+   58     | expr . T_DIV expr
+   58     | expr T_DIV expr .
+   59     | expr . T_MOD expr
+   60     | expr . T_SEPARATOR
 
     T_SEPARATOR  shift, and go to state 82
     '+'          shift, and go to state 83
     '-'          shift, and go to state 84
     '*'          shift, and go to state 85
 
-    $default  reduce using rule 60 (expr)
+    $default  reduce using rule 58 (expr)
 
 
 State 102
 
-   57 expr: expr . '+' expr
-   58     | expr . '-' expr
-   59     | expr . '*' expr
-   60     | expr . T_DIV expr
-   61     | expr . T_MOD expr
-   61     | expr T_MOD expr .
-   62     | expr . T_SEPARATOR
+   55 expr: expr . '+' expr
+   56     | expr . '-' expr
+   57     | expr . '*' expr
+   58     | expr . T_DIV expr
+   59     | expr . T_MOD expr
+   59     | expr T_MOD expr .
+   60     | expr . T_SEPARATOR
 
     T_SEPARATOR  shift, and go to state 82
     '+'          shift, and go to state 83
     '-'          shift, and go to state 84
     '*'          shift, and go to state 85
 
-    $default  reduce using rule 61 (expr)
+    $default  reduce using rule 59 (expr)
 
 
 State 103
 
-   57 expr: expr . '+' expr
-   58     | expr . '-' expr
-   59     | expr . '*' expr
-   60     | expr . T_DIV expr
-   61     | expr . T_MOD expr
-   62     | expr . T_SEPARATOR
-   67 cond: expr T_OPERATOR expr .
+   55 expr: expr . '+' expr
+   56     | expr . '-' expr
+   57     | expr . '*' expr
+   58     | expr . T_DIV expr
+   59     | expr . T_MOD expr
+   60     | expr . T_SEPARATOR
+   65 cond: expr T_OPERATOR expr .
 
     T_DIV        shift, and go to state 79
     T_MOD        shift, and go to state 80
@@ -1429,86 +1420,81 @@ State 103
     '-'          shift, and go to state 84
     '*'          shift, and go to state 85
 
-    $default  reduce using rule 67 (cond)
+    $default  reduce using rule 65 (cond)
 
 
 State 104
 
-   57 expr: expr . '+' expr
-   57     | expr '+' expr .
-   58     | expr . '-' expr
-   59     | expr . '*' expr
-   60     | expr . T_DIV expr
-   61     | expr . T_MOD expr
-   62     | expr . T_SEPARATOR
+   55 expr: expr . '+' expr
+   55     | expr '+' expr .
+   56     | expr . '-' expr
+   57     | expr . '*' expr
+   58     | expr . T_DIV expr
+   59     | expr . T_MOD expr
+   60     | expr . T_SEPARATOR
 
     T_SEPARATOR  shift, and go to state 82
     '*'          shift, and go to state 85
 
-    $default  reduce using rule 57 (expr)
+    $default  reduce using rule 55 (expr)
 
 
 State 105
 
-   57 expr: expr . '+' expr
-   58     | expr . '-' expr
-   58     | expr '-' expr .
-   59     | expr . '*' expr
-   60     | expr . T_DIV expr
-   61     | expr . T_MOD expr
-   62     | expr . T_SEPARATOR
+   55 expr: expr . '+' expr
+   56     | expr . '-' expr
+   56     | expr '-' expr .
+   57     | expr . '*' expr
+   58     | expr . T_DIV expr
+   59     | expr . T_MOD expr
+   60     | expr . T_SEPARATOR
 
     T_SEPARATOR  shift, and go to state 82
     '*'          shift, and go to state 85
 
-    $default  reduce using rule 58 (expr)
+    $default  reduce using rule 56 (expr)
 
 
 State 106
 
-   57 expr: expr . '+' expr
-   58     | expr . '-' expr
-   59     | expr . '*' expr
-   59     | expr '*' expr .
-   60     | expr . T_DIV expr
-   61     | expr . T_MOD expr
-   62     | expr . T_SEPARATOR
+   55 expr: expr . '+' expr
+   56     | expr . '-' expr
+   57     | expr . '*' expr
+   57     | expr '*' expr .
+   58     | expr . T_DIV expr
+   59     | expr . T_MOD expr
+   60     | expr . T_SEPARATOR
 
     T_SEPARATOR  shift, and go to state 82
 
-    $default  reduce using rule 59 (expr)
+    $default  reduce using rule 57 (expr)
 
 
 State 107
 
-   65 cond: cond . T_AND cond
-   65     | cond T_AND cond .
-   66     | cond . T_OR cond
+   63 cond: cond . T_AND cond
+   63     | cond T_AND cond .
+   64     | cond . T_OR cond
 
-    $default  reduce using rule 65 (cond)
+    $default  reduce using rule 63 (cond)
 
 
 State 108
 
-   65 cond: cond . T_AND cond
-   66     | cond . T_OR cond
-   66     | cond T_OR cond .
+   63 cond: cond . T_AND cond
+   64     | cond . T_OR cond
+   64     | cond T_OR cond .
 
     T_AND  shift, and go to state 86
 
-    $default  reduce using rule 66 (cond)
+    $default  reduce using rule 64 (cond)
 
 
 State 109
 
-   32 stmt: T_IF cond T_THEN stmt . if_else_opt
+   32 stmt: T_IF cond T_THEN stmt . '[' T_ELSE stmt ']'
 
-    T_ELSE  shift, and go to state 118
-
-    T_ELSE    [reduce using rule 35 (if_else_opt)]
-    $default  reduce using rule 35 (if_else_opt)
-
-    if_else_opt  go to state 119
+    '['  shift, and go to state 118
 
 
 State 110
@@ -1520,14 +1506,14 @@ State 110
 
 State 111
 
-   42 func_call: T_ID '(' expr_list_opt ')' .
+   40 func_call: T_ID '(' expr_list_opt ')' .
 
-    $default  reduce using rule 42 (func_call)
+    $default  reduce using rule 40 (func_call)
 
 
 State 112
 
-   46 expr_list: expr_list ',' . expr
+   44 expr_list: expr_list ',' . expr
 
     T_ID          shift, and go to state 33
     T_NUM         shift, and go to state 50
@@ -1539,14 +1525,14 @@ State 112
 
     func_call  go to state 55
     l_value    go to state 56
-    expr       go to state 120
+    expr       go to state 119
 
 
 State 113
 
-   49 l_value: l_value '[' expr ']' .
+   47 l_value: l_value '[' expr ']' .
 
-    $default  reduce using rule 49 (l_value)
+    $default  reduce using rule 47 (l_value)
 
 
 State 114
@@ -1560,7 +1546,7 @@ State 115
 
    20 fpar_type: data_type '[' T_NUM . ']'
 
-    ']'  shift, and go to state 121
+    ']'  shift, and go to state 120
 
 
 State 116
@@ -1579,7 +1565,41 @@ State 117
 
 State 118
 
-   36 if_else_opt: T_ELSE . stmt
+   32 stmt: T_IF cond T_THEN stmt '[' . T_ELSE stmt ']'
+
+    T_ELSE  shift, and go to state 121
+
+
+State 119
+
+   44 expr_list: expr_list ',' expr .
+   55 expr: expr . '+' expr
+   56     | expr . '-' expr
+   57     | expr . '*' expr
+   58     | expr . T_DIV expr
+   59     | expr . T_MOD expr
+   60     | expr . T_SEPARATOR
+
+    T_DIV        shift, and go to state 79
+    T_MOD        shift, and go to state 80
+    T_SEPARATOR  shift, and go to state 82
+    '+'          shift, and go to state 83
+    '-'          shift, and go to state 84
+    '*'          shift, and go to state 85
+
+    $default  reduce using rule 44 (expr_list)
+
+
+State 120
+
+   20 fpar_type: data_type '[' T_NUM ']' .
+
+    $default  reduce using rule 20 (fpar_type)
+
+
+State 121
+
+   32 stmt: T_IF cond T_THEN stmt '[' T_ELSE . stmt ']'
 
     T_IF      shift, and go to state 30
     T_RETURN  shift, and go to state 31
@@ -1595,42 +1615,15 @@ State 118
     l_value    go to state 40
 
 
-State 119
-
-   32 stmt: T_IF cond T_THEN stmt if_else_opt .
-
-    $default  reduce using rule 32 (stmt)
-
-
-State 120
-
-   46 expr_list: expr_list ',' expr .
-   57 expr: expr . '+' expr
-   58     | expr . '-' expr
-   59     | expr . '*' expr
-   60     | expr . T_DIV expr
-   61     | expr . T_MOD expr
-   62     | expr . T_SEPARATOR
-
-    T_DIV        shift, and go to state 79
-    T_MOD        shift, and go to state 80
-    T_SEPARATOR  shift, and go to state 82
-    '+'          shift, and go to state 83
-    '-'          shift, and go to state 84
-    '*'          shift, and go to state 85
-
-    $default  reduce using rule 46 (expr_list)
-
-
-State 121
-
-   20 fpar_type: data_type '[' T_NUM ']' .
-
-    $default  reduce using rule 20 (fpar_type)
-
-
 State 122
 
-   36 if_else_opt: T_ELSE stmt .
+   32 stmt: T_IF cond T_THEN stmt '[' T_ELSE stmt . ']'
 
-    $default  reduce using rule 36 (if_else_opt)
+    ']'  shift, and go to state 123
+
+
+State 123
+
+   32 stmt: T_IF cond T_THEN stmt '[' T_ELSE stmt ']' .
+
+    $default  reduce using rule 32 (stmt)
