@@ -168,10 +168,13 @@ cond
 
 %%
 
+extern int yylineno;
+
 void yyerror(const char *msg) {
-  fprintf(stderr, "%s\n", msg);
+  fprintf(stderr, "Line %d: %s\n", yylineno, msg);
   exit(1);
 }
+
 
 int main() {
     int result = yyparse();
