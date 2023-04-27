@@ -1,7 +1,8 @@
 $$ dgegdiyeg 
     sssw
-    wsw$'declarationd
+    wswd'eclarationd
 $$ 
+$dded
 fun main () : nothing
 
  fun bsort (n : int; ref x : int[]) : nothing

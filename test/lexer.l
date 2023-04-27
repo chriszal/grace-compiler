@@ -66,15 +66,16 @@ separator   [\(\)\[\]\{\},;:]|<-
 {separator}     { return T_SEPARATOR; }
 
 {ws}            {}
-\$.*\n          { }
-\$\$            { BEGIN(COMMENT); }
 
+\$[^$\n]*       { }
 
-<COMMENT>\$\$     { BEGIN(INITIAL); }
-<COMMENT>[^\$\n]+ { }
-<COMMENT>\$[^$]   { }
+\$\$             { BEGIN(COMMENT);}
+
+<COMMENT>\$\$    { BEGIN(INITIAL);}
+<COMMENT>[^$\n]+ { }
+<COMMENT>\$[^$\n]{0,1} { }
 <COMMENT>\n       { }
-<COMMENT>.        { } 
+
 
 .               { printf("Illegal token\n"); exit(1); }
 

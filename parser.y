@@ -9,158 +9,164 @@ void yyerror(const char *msg);
 
 %token T_AND T_CHAR T_DIV T_DO T_ELSE T_FUN T_IF T_INT T_MOD T_NOT T_NOTHING T_OR T_REF T_RETURN T_THEN T_VAR T_WHILE T_ID T_NUM T_FIXED_CHAR T_STR T_OPERATOR T_SEPARATOR
 
-%expect 1
-%left T_OPERATOR
+%expect 0
+%left T_OR
+%left T_AND
+%right T_NOT
+%right T_OPERATOR
+%left T_MOD T_DIV
 %left '+' '-'
 %left '*'
-%left T_AND T_OR
-%left T_EQ T_NE T_LT T_GT T_LE T_GE
+%left T_ELSE
+%nonassoc UMINUS
+%nonassoc T_SEPARATOR
+
 
 %start program
 
 %%
 
 program :
-    declarations
-    compound_stmt
+    | program func_def
     ;
 
-declarations :
-    | declarations declaration
+func_def :
+    header local_defs block
     ;
 
-declaration :
-    var_declaration
-    | fun_declaration
-    | fun_definition
+header :
+    T_FUN T_ID '(' fpar_def_list ')' ':' ret_type
     ;
 
-var_declaration :
-    T_VAR var_list ':' type ';'
+fpar_def_list :
+    fpar_def
+    | fpar_def_list ';' fpar_def
     ;
 
-var_list :
+fpar_def :
+    ref_opt id_list ':' fpar_type
+    ;
+
+ref_opt :
+    | T_REF
+    ;
+
+id_list :
     T_ID
-    | var_list ',' T_ID
+    | id_list ',' T_ID
+    ;
+
+data_type :
+    T_INT
+    | T_CHAR
     ;
 
 type :
-    T_INT
-    | T_CHAR
-    | array_type
+    data_type
+    | data_type '[' T_NUM ']'
     ;
 
-array_type :
-    type '[' T_NUM ']'
+ret_type :
+    data_type
+    | T_NOTHING
     ;
 
-fun_declaration :
-    T_FUN T_ID '(' formal_param_list ')' ':' type ';'
+fpar_type :
+    data_type
+    | data_type '[' ']'
+    | data_type '[' T_NUM ']'
     ;
 
-formal_param_list :
-    | formal_param_list ',' formal_params
+local_defs :
+    | local_defs local_def
     ;
 
-formal_params :
-    T_REF param_list ':' type
-    | param_list ':' type
+local_def :
+    func_def
+    | func_decl
+    | var_def
     ;
 
-param_list :
-    T_ID
-    | param_list ',' T_ID
+var_def :
+    T_VAR id_list ':' type ';'
     ;
 
-fun_definition :
-    T_FUN T_ID '(' formal_param_list ')' ':' type declarations compound_stmt
-    ;
-
-stmtlst :
-    | stmtlst stmt
-    ;
-
-compound_stmt :
-    '{' stmtlst '}'
+func_decl :
+    header ';'
     ;
 
 stmt :
-    var_declaration
-    | fun_definition
-    | fun_declaration
-    | compound_stmt
-    | if_stmt
-    | while_stmt
-    | assign_stmt
-    | fun_call_stmt
-    | return_stmt
-    | T_SEPARATOR
+    ';'
+    | l_value "<-" expr ';'
+    | block
+    | func_call ';'
+    | T_IF cond T_THEN stmt if_else_opt
+    | T_WHILE cond T_DO stmt
+    | T_RETURN expr_opt ';'
     ;
 
-assign_stmt :
-    l_value T_SEPARATOR expr
+if_else_opt :
+    | T_ELSE stmt
+    ;
+
+
+expr_opt :
+    | expr
+    ;
+
+block :
+    '{' stmt_list '}'
+    ;
+
+stmt_list :
+    | stmt_list stmt
+    ;
+
+func_call :
+    T_ID '(' expr_list_opt ')'
+    ;
+
+expr_list_opt :
+    | expr_list
+    ;
+
+expr_list :
+    expr
+    | expr_list ',' expr
     ;
 
 l_value :
     T_ID
-    | array_access
+    | T_STR
+    | l_value '[' expr ']'
     ;
 
-array_access :
-    expr '[' expr ']'
-    ;
-
-if_stmt :
-    "if" expr "then" stmt "else" stmt
-    | "if" expr "then" stmt
-    ;
-
-while_stmt :
-    "while" expr "do" stmt
-    ;
-
-fun_call_stmt :
-    T_ID '(' actual_param_list ')' T_SEPARATOR
-    ;
-
-actual_param_list :
-    | actual_param_list ',' expr
-    ;
-
-return_stmt :
-    "return" expr T_SEPARATOR
-    | "return" T_SEPARATOR
-    ;
-
-expr :
-    l_value
+expr
+    : T_NUM
+    | T_FIXED_CHAR
+    | l_value
+    | func_call
+    | '(' expr ')'
+    | '+' expr %prec UMINUS
+    | '-' expr %prec UMINUS
     | expr '+' expr
     | expr '-' expr
     | expr '*' expr
-    | expr T_AND expr
-    | expr T_OR expr
-    | expr T_EQ expr
-    | expr T_NE expr
-    | expr T_LT expr
-    | expr T_GT expr
-    | expr T_LE expr
-    | expr T_GE expr
-    | '(' expr ')'
-    | T_NUM
-    | T_OPERATOR logical_expr
-    | fun_call_expr
+    | expr T_DIV expr
+    | expr T_MOD expr
+    | expr T_SEPARATOR %prec T_SEPARATOR
     ;
 
-logical_expr :
-    expr T_OPERATOR expr
+cond
+    : '(' cond ')'
+    | T_NOT cond
+    | cond T_AND cond
+    | cond T_OR cond
+    | expr T_OPERATOR expr
     ;
 
-fun_call_expr :
-    T_ID '(' actual_param_list ')'
-    ;
 
 %%
-
 
 void yyerror(const char *msg) {
   fprintf(stderr, "%s\n", msg);
