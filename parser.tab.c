@@ -68,6 +68,8 @@
 /* First part of user prologue.  */
 #line 1 "parser.y"
 
+#define YYDEBUG 1
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -75,7 +77,7 @@ int yylex();
 void yyerror(const char *msg);
 
 
-#line 79 "parser.tab.c"
+#line 81 "parser.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -527,13 +529,13 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    29,    29,    30,    34,    38,    42,    43,    47,    50,
-      51,    55,    56,    60,    61,    65,    66,    70,    71,    75,
-      76,    77,    80,    81,    85,    86,    87,    91,    95,    99,
-     100,   101,   102,   103,   104,   105,   109,   110,   114,   117,
-     118,   122,   125,   126,   130,   131,   135,   136,   137,   141,
-     142,   143,   144,   145,   146,   147,   148,   149,   150,   151,
-     152,   153,   157,   158,   159,   160,   161
+       0,    31,    31,    32,    36,    40,    44,    45,    49,    52,
+      53,    57,    58,    62,    63,    67,    68,    72,    73,    77,
+      78,    79,    82,    83,    87,    88,    89,    93,    97,   101,
+     102,   103,   104,   105,   106,   107,   111,   112,   116,   119,
+     120,   124,   127,   128,   132,   133,   137,   138,   139,   143,
+     144,   145,   146,   147,   148,   149,   150,   151,   152,   153,
+     154,   155,   159,   160,   161,   162,   163
 };
 #endif
 
@@ -1413,7 +1415,7 @@ yyreduce:
   switch (yyn)
     {
 
-#line 1417 "parser.tab.c"
+#line 1419 "parser.tab.c"
 
       default: break;
     }
@@ -1645,16 +1647,19 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 165 "parser.y"
+#line 167 "parser.y"
 
+
+extern int yylineno;
 
 void yyerror(const char *msg) {
-  fprintf(stderr, "%s\n", msg);
+  fprintf(stderr, "Line %d: %s\n", yylineno, msg);
   exit(1);
 }
 
 
 int main() {
+    yydebug = 1; 
     int result = yyparse();
     if (result == 0) printf("Success.\n");
     return result;

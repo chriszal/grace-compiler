@@ -1,4 +1,6 @@
 %{
+#define YYDEBUG 1
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -173,6 +175,7 @@ void yyerror(const char *msg) {
 
 
 int main() {
+    yydebug = 1; 
     int result = yyparse();
     if (result == 0) printf("Success.\n");
     return result;
