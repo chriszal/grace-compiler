@@ -14,12 +14,15 @@ delim       [ \t\n]
 ws          {delim}+
 l           [A-Za-z]
 d           [0-9]
-fixed_char  (\\([\\'\"ntr0]|x[a-fA-F0-9]{2})|[^\\'"])
-str_char    (\\([\\\"ntr0]|x[a-fA-F0-9]{2})|[^\\""])
-operator    (\+|-|\*|\/|#|=|<>|<|>|<=|>=)
-separator   [\(\)\[\]\{\},;:]|<-
+common_char [^\\'"\n]
+escape_seq  (\\[ntr0'"]|\\x[a-fA-F0-9]{2})
+fixed_char  ({common_char}|{escape_seq})
+str_char    ({common_char}|{escape_seq})
+
+
 
 %%
+\n              { ++yylineno; }
 
 "and"          { return T_AND; }
 "char"         { return T_CHAR; }
@@ -38,15 +41,41 @@ separator   [\(\)\[\]\{\},;:]|<-
 "then"         { return T_THEN; }
 "var"          { return T_VAR; }
 "while"        { return T_WHILE; }
+"("           { return T_LPAREN; }
+")"           { return T_RPAREN; }
+"["           { return T_LBRACKET; }
+"]"           { return T_RBRACKET; }
+"{"           { return T_LBRACE; }
+"}"           { return T_RBRACE; }
+","           { return T_COMMA; }
+";"           { return T_SEMICOLON; }
+":"           { return T_COLON; }
+"<-"          { return T_ASSIGN; }
+
+"+"           { return T_PLUS; }
+"-"           { return T_MINUS; }
+"*"           { return T_MULTIPLY; }
+"/"           { return T_DIVIDE; }
+"#"           { return T_HASH; }
+"="           { return T_EQUAL; }
+"<>"          { return T_NOT_EQUAL; }
+"<"           { return T_LESS_THAN; }
+">"           { return T_GREATER_THAN; }
+"<="          { return T_LESS_EQUAL; }
+">="          { return T_GREATER_EQUAL; }
+
 
 {l}({l}|{d}|_)* { return T_ID; }
 {d}+            { return T_NUM; }
 '{fixed_char}'  { return T_FIXED_CHAR; }
 \"{str_char}*\" { return T_STR; }
-{operator}      { return T_OPERATOR; }
-{separator}     { return T_SEPARATOR; }
 
-{ws}            {}
+{delim}         {
+                    if (*yytext == '\n') {
+                        ++yylineno;
+                    }
+                }
+
 \$[^$\n]*       { }
 
 \$\$             { BEGIN(COMMENT);}
@@ -54,8 +83,11 @@ separator   [\(\)\[\]\{\},;:]|<-
 <COMMENT>\$\$    { BEGIN(INITIAL);}
 <COMMENT>[^$\n]+ { }
 <COMMENT>\$[^$\n]{0,1} { }
-<COMMENT>\n       { }
+<COMMENT>\n       {++yylineno;  }
+<<EOF>> { return 0; } 
 
 .               { printf("Illegal token\n"); exit(1); }
+
+
 
 %%

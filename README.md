@@ -1,175 +1,87 @@
-# grace-compiler
-%{
-#include <stdio.h>
-#include <stdlib.h>
+## Execute
+* Cleans up unwanted files.
+```
+make clean
+```
+* Builds the compiler and creates the parser executable
+``` 
+make 
+```
+* Replace your_input_file.txt with the name of the input file you want to use. This command runs the parser with the specified input file.
+```
+INPUT=your_input_file.txt make run
+```
+## Lexer
 
-int yylex();
-void yyerror(const char *msg);
+### 1. Header section:
+Includes the parser.tab.h file which will grab the tokens from the parser.
+### 2. Options:
+These options configure the behavior of the lexer. ``debug`` enables debug mode, and ``noyywrap`` disables the default behavior of calling the ``yywrap`` function when the lexer encounters the end of the input file.
+### 3. Start condition:
+This declares an exclusive start condition named COMMENT, which is used to handle multi-line comments in the lexer.
+### 4. Definitions:
+* ``delim``: Matches a single whitespace character, which can be a space, tab, or newline. `[ \t\n]`
+* ``ws``: Matches one or more whitespace characters (spaces, tabs, or newlines). `{delim}+`
+* ``l``: Matches a single lowercase or uppercase letter. `[A-Za-z]`
+* ``d``: Matches a single digit. `[0-9]`
+* ``common_char``: Matches any character except backslash, single quote, double quote, or newline. `[^\\'"\n]`
+* ``escape_seq``: Matches escape sequences like `\n, \t, \r, \0, \\, \', \", and \xnn` (where nn is a two-digit hexadecimal number). `(\\[ntr0'"]|\\x[a-fA-F0-9]{2})`
+* ``fixed_char``: Matches a single character from a fixed character constant, which can be a common character or an escape sequence. `({common_char}|{escape_seq})`
+* ``str_char``: Matches a single character from a string constant, which can be a common character or an escape sequence. `({common_char}|{escape_seq})`
 
-%}
+### 5. Rules:
+* Increment line number when a newline is encountered: `\n { ++yylineno; }`
+* Match and return identifiers: `{l}({l}|{d}|_)* { return T_ID; }`
+* Match and return numeric constants: `{d}+ { return T_NUM; }`
+* Match and return fixed character constants: `' {fixed_char} ' { return T_FIXED_CHAR; }`
+* Match and return string constants: `\" {str_char}* \" { return T_STR; }`
+* Handle whitespace and increment line number for newlines: `{delim} { if (*yytext == '\n') { ++yylineno; } }`
+* Discard single-line comments: `\$[^$\n]* { }`
+* Handle multi-line comments:
+    * Enter COMMENT start condition: `\$\$ { BEGIN(COMMENT); }`
+    * Exit COMMENT start condition: `<COMMENT>\$\$ { BEGIN(INITIAL); }`
+    * Discard any non-newline characters in a COMMENT: `<COMMENT>[^$\n]+ { }`
+    * Discard a single $ followed by a non-newline character in a COMMENT
+    * Increment line number for newlines in a COMMENT: `<COMMENT>\n { ++yylineno; }`
+* Return 0 at the end of the file: `<<EOF>> { return 0; }`
+* Print an error message and exit when an illegal token is encountered: `. { printf("Illegal token\n"); exit(1); }`
+## Parser
+### 1. Token Definitions:
 
-%token T_AND T_CHAR T_DIV T_DO T_ELSE T_FUN T_IF T_INT T_MOD T_NOT T_NOTHING T_OR T_REF T_RETURN T_THEN T_VAR T_WHILE T_ID T_NUM T_FIXED_CHAR T_STR T_OPERATOR T_SEPARATOR
+These are the tokens defined by the lexer. They are matched in the parser rules.
 
-%expect 1
-%left T_OPERATOR
-%left '+' '-'
-%left '*'
-%left T_AND T_OR
-%left T_EQ T_NE T_LT T_GT T_LE T_GE
+### 2. Precedence and Associativity:
 
-%start program
+These directives define the precedence and associativity of the operators used in expressions.
 
-%%
+1. `%left T_OR`: The T_OR token has left associativity.
+2. `%left T_AND`: The T_AND token has left associativity.
+3. `%right T_NOT`: The T_NOT token has right associativity.
+4. `%left T_HASH T_EQUAL T_NOT_EQUAL T_LESS_THAN T_GREATER_THAN T_LESS_EQUAL 
+T_GREATER_EQUAL`: All these tokens have left associativity.
+5. `%left T_MOD T_DIV`: Both tokens have left associativity.
+6. `%left T_PLUS T_MINUS`: Both tokens have left associativity.
+7. `%left T_MULTIPLY`: The T_MULTIPLY token has left associativity.
 
-program :
-    declarations
-    compound_stmt
-    ;
+### 3. Rules:
 
-declarations :
-    | declarations declaration
-    ;
+1. `program`: func_def;: A program consists of a single function definition.
+2. `func_def`: header local_defs block;: A function definition consists of a header, local definitions, and a block.
+3. `header: T_FUN T_ID "(" fpar_defs ")" ":" ret_type;`: The header of a function definition has the keyword fun, an identifier, a list of formal parameters, and a return type.
+4. `fpar_defs, fpar_def, ref_opt, id_list, fpar_type, data_type, arr_opt, ret_type`: These rules define the structure of formal parameters, data types, and return types.
+5. `local_defs, local_def`: These rules define local definitions within a function, which can be other function definitions, function declarations, or variable definitions.
+6. `var_def, type`: These rules define variable definitions and their types.
+7. `func_decl`: This rule defines function declarations.
+8. `stmt, else_opt, expr_opt, block, stmts`: These rules define statements, such as assignments, blocks, function calls, conditionals, loops, and return statements.
+9. `func_call, exprs, expr_list`: These rules define function calls and their argument expressions.
+10. `l_value`: This rule defines l-values, which can be identifiers, string literals, or array elements.
+11. `expr`: This rule defines expressions, including numeric and character literals, l-values, function calls, and various arithmetic operations.
+12. `cond`: This rule defines conditions, including comparisons and logical operations.
 
-declaration :
-    var_declaration
-    | fun_declaration
-    | fun_definition
-    ;
+### 4. Error Handling:
 
-var_declaration :
-    T_VAR var_list ':' type ';'
-    ;
+The `yyerror` function is called when the parser encounters a syntax error. It prints the line number, an error message, and the current token.
 
-var_list :
-    T_ID
-    | var_list ',' T_ID
-    ;
+### 5. Main Function:
 
-type :
-    T_INT
-    | T_CHAR
-    | array_type
-    ;
-
-array_type :
-    type '[' T_NUM ']'
-    ;
-
-fun_declaration :
-    T_FUN T_ID '(' formal_param_list ')' ':' type ';'
-    ;
-
-formal_param_list :
-    | formal_param_list ',' formal_params
-    ;
-
-formal_params :
-    T_REF param_list ':' type
-    | param_list ':' type
-    ;
-
-param_list :
-    T_ID
-    | param_list ',' T_ID
-    ;
-
-fun_definition :
-    T_FUN T_ID '(' formal_param_list ')' ':' type declarations compound_stmt
-    ;
-
-stmtlst :
-    | stmtlst stmt
-    ;
-
-compound_stmt :
-    '{' stmtlst '}'
-    ;
-
-stmt :
-    var_declaration
-    | fun_definition
-    | fun_declaration
-    | compound_stmt
-    | if_stmt
-    | while_stmt
-    | assign_stmt
-    | fun_call_stmt
-    | return_stmt
-    | T_SEPARATOR
-    ;
-
-assign_stmt :
-    l_value T_SEPARATOR expr
-    ;
-
-l_value :
-    T_ID
-    | array_access
-    ;
-
-array_access :
-    expr '[' expr ']'
-    ;
-
-if_stmt :
-    "if" expr "then" stmt "else" stmt
-    | "if" expr "then" stmt
-    ;
-
-while_stmt :
-    "while" expr "do" stmt
-    ;
-
-fun_call_stmt :
-    T_ID '(' actual_param_list ')' T_SEPARATOR
-    ;
-
-actual_param_list :
-    | actual_param_list ',' expr
-    ;
-
-return_stmt :
-    "return" expr T_SEPARATOR
-    | "return" T_SEPARATOR
-    ;
-
-expr :
-    l_value
-    | expr '+' expr
-    | expr '-' expr
-    | expr '*' expr
-    | expr T_AND expr
-    | expr T_OR expr
-    | expr T_EQ expr
-    | expr T_NE expr
-    | expr T_LT expr
-    | expr T_GT expr
-    | expr T_LE expr
-    | expr T_GE expr
-    | '(' expr ')'
-    | T_NUM
-    | T_OPERATOR logical_expr
-    | fun_call_expr
-    ;
-
-logical_expr :
-    expr T_OPERATOR expr
-    ;
-
-fun_call_expr :
-    T_ID '(' actual_param_list ')'
-    ;
-
-%%
-
-
-void yyerror(const char *msg) {
-  fprintf(stderr, "%s\n", msg);
-  exit(1);
-}
-
-int main() {
-    int result = yyparse();
-    if (result == 0) printf("Success.\n");
-    return result;
-}
+The main function calls the `yyparse` function to parse the input. If the parsing is successful, it prints "Success."
