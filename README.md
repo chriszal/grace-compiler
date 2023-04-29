@@ -65,8 +65,8 @@ T_GREATER_EQUAL`: All these tokens have left associativity.
 
 ### 3. Rules:
 
-1. `program`: func_def;: A program consists of a single function definition.
-2. `func_def`: header local_defs block;: A function definition consists of a header, local definitions, and a block.
+1. `program: func_def;`: A program consists of a single function definition.
+2. `func_def: header local_defs block;`: A function definition consists of a header, local definitions, and a block.
 3. `header: T_FUN T_ID "(" fpar_defs ")" ":" ret_type;`: The header of a function definition has the keyword fun, an identifier, a list of formal parameters, and a return type.
 4. `fpar_defs, fpar_def, ref_opt, id_list, fpar_type, data_type, arr_opt, ret_type`: These rules define the structure of formal parameters, data types, and return types.
 5. `local_defs, local_def`: These rules define local definitions within a function, which can be other function definitions, function declarations, or variable definitions.
