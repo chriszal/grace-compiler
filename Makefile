@@ -1,18 +1,23 @@
-.PHONY: all clean run
+.PHONY: minibasic
 
-all: parser
+minibasic: lexer.o parser.o ast.o print.o
+	$(CC) $^ -o $@
 
-parser: lex.yy.c parser.tab.c
-	gcc  lex.yy.c parser.tab.c -o parser
+lexer.o: ast.h
+parser.o: ast.h
 
-lex.yy.c: lexer.l
-	flex lexer.l
+lexer.c: lexer.l parser.h
+	flex -o lexer.c lexer.l
 
-parser.tab.c: parser.y
-	bison -d parser.y
+parser.c parser.h: parser.y
+	bison -d -o parser.c parser.y
 
 clean:
-	rm -f parser lex.yy.c parser.tab.c parser.tab.h parser.output
+	rm -f *.o
 
-run: parser
-	./parser < $(INPUT)
+distclean: clean
+	rm -f minibasic lexer.c parser.c parser.h
+
+
+run: minibasic
+	./minibasic < $(INPUT)

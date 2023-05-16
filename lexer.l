@@ -1,8 +1,9 @@
 %{
 #define YY_DECL int yylex(void)
 
-
-#include "parser.tab.h"
+#include <stdlib.h>
+#include "ast.h"
+#include "parser.h"
 #include <stdio.h>
 %}
 %option debug
@@ -65,8 +66,8 @@ str_char    ({common_char}|{escape_seq})
 ">="          { return T_GREATER_EQUAL; }
 
 
-{l}({l}|{d}|_)* { return T_ID; }
-{d}+            { return T_NUM; }
+{l}({l}|{d}|_)* { yylval.c = yytext[0]; return T_ID; }
+{d}+            { yylval.n = atoi(yytext); return T_NUM; }
 '{fixed_char}'  { return T_FIXED_CHAR; }
 \"{str_char}*\" { return T_STR; }
 
