@@ -84,13 +84,13 @@ extern int yydebug;
     T_MINUS = 290,
     T_MULTIPLY = 291,
     T_DIVIDE = 292,
-    T_HASH = 293,
+    T_NOT_EQUAL = 293,
     T_EQUAL = 294,
-    T_NOT_EQUAL = 295,
-    T_LESS_THAN = 296,
-    T_GREATER_THAN = 297,
-    T_LESS_EQUAL = 298,
-    T_GREATER_EQUAL = 299
+    T_LESS_THAN = 295,
+    T_GREATER_THAN = 296,
+    T_LESS_EQUAL = 297,
+    T_GREATER_EQUAL = 298,
+    T_HASH = 299
   };
 #endif
 
@@ -98,7 +98,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 15 "parser.y"
+#line 18 "parser.y"
 
   ast node;
   char c;

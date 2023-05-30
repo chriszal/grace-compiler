@@ -1,1 +1,10 @@
- fun swap (ref x, y : int) : nothing
+fun solve ( ) : nothing
+ fun hanoi (rings : int; ref x : int[]; ref source, target, auxiliary : char[]) : nothing
+ {
+ if x[rings] > x[rings+1] then  {
+ hanoi(rings-1, source, auxiliary, target);
+ }
+ }
+ var NumberOfRings : int;
+ {
+ }

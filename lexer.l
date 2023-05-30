@@ -5,6 +5,7 @@
 #include "ast.h"
 #include "parser.h"
 #include <stdio.h>
+#include <string.h>
 %}
 %option debug
 %option noyywrap
@@ -56,20 +57,18 @@ str_char    ({common_char}|{escape_seq})
 "+"           { return T_PLUS; }
 "-"           { return T_MINUS; }
 "*"           { return T_MULTIPLY; }
-"/"           { return T_DIVIDE; }
-"#"           { return T_HASH; }
+"#"           { return T_NOT_EQUAL; }
 "="           { return T_EQUAL; }
-"<>"          { return T_NOT_EQUAL; }
 "<"           { return T_LESS_THAN; }
 ">"           { return T_GREATER_THAN; }
 "<="          { return T_LESS_EQUAL; }
 ">="          { return T_GREATER_EQUAL; }
 
 
-{l}({l}|{d}|_)* { yylval.c = yytext[0]; return T_ID; }
+{l}({l}|{d}|_)* { yylval.str = strdup(yytext); printf("Token: ID, Value: %s\n", yylval.str); return T_ID; }
 {d}+            { yylval.n = atoi(yytext); return T_NUM; }
-'{fixed_char}'  { return T_FIXED_CHAR; }
-\"{str_char}*\" { return T_STR; }
+'{fixed_char}'  { yylval.c = yytext[1]; return T_FIXED_CHAR; }
+\"{str_char}*\" { yylval.str = strdup(yytext); return T_STR; }
 
 {delim}         {
                     if (*yytext == '\n') {
@@ -85,7 +84,6 @@ str_char    ({common_char}|{escape_seq})
 <COMMENT>[^$\n]+ { }
 <COMMENT>\$[^$\n]{0,1} { }
 <COMMENT>\n       {++yylineno;  }
-<<EOF>> { return 0; } 
 
 .               { printf("Illegal token\n"); exit(1); }
 

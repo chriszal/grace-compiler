@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include "ast.h"
 #include "print.h"
+#include "type.h"
+#include "symbol.h"
+#include "sem.h"
 
 extern int yylex();
 extern int yyparse();
@@ -21,27 +24,26 @@ void yyerror(const char *msg);
 
 %token T_AND T_CHAR T_DIV T_DO T_ELSE T_FUN T_IF T_INT T_MOD T_NOT T_NOTHING
 %token T_OR T_REF T_RETURN T_THEN T_VAR T_WHILE
-%token<c> T_ID 
+%token<str> T_ID 
 %token<n> T_NUM 
 %token<c> T_FIXED_CHAR 
 %token<str> T_STR
-%token<c> T_LPAREN "("
-%token<c> T_RPAREN ")"
+%token T_LPAREN "("
+%token T_RPAREN ")"
 %token<c> T_LBRACKET "["
 %token<c> T_RBRACKET "]"
 %token<c> T_LBRACE "{"
 %token<c> T_RBRACE "}"
-%token<c> T_COMMA ","
-%token<c> T_SEMICOLON ";"
-%token<c> T_COLON ":"
+%token T_COMMA ","
+%token T_SEMICOLON ";"
+%token T_COLON ":"
 %token<c> T_ASSIGN "<-"
 %token<c> T_PLUS "+"
 %token<c> T_MINUS "-"
 %token<c> T_MULTIPLY "*"
 %token<c> T_DIVIDE "/"
-%token<c> T_HASH "#"
+%token<c> T_NOT_EQUAL "#"
 %token<c> T_EQUAL "="
-%token<c> T_NOT_EQUAL "<>"
 %token<c> T_LESS_THAN "<"
 %token<c> T_GREATER_THAN ">"
 %token<c> T_LESS_EQUAL "<="
@@ -65,152 +67,146 @@ program:
     
 
 func_def:
-    header local_defs block                    { $$ = ast_function_def($1, $3); }
+    header local_defs block                    { $$ = ast_function_def($1,$2, $3); }
     
 
 header:
-    T_FUN T_ID "(" fpar_defs ")" ":" ret_type  { $$ = ast_function_def($1, $7); }
+    T_FUN T_ID "(" fpar_defs ")" ":" ret_type  { $$ = ast_fun($2,$4,$7); }
     
 
 fpar_defs:
-    /* empty */                                 { $$ = NULL; }
+    /* empty */                                 { $$ = ast_empty_stmts(); }
     | fpar_def                                  { $$ = $1; }
-    | fpar_defs ";" fpar_def                    { $$ = ast_sep(SEMICOLON, $1, $3); }
+    | fpar_defs ";" fpar_def                    { $$ = ast_fpar_defs($1, $3); }
     
 
 fpar_def:
-    ref_opt id_list ":" fpar_type               { $$ = ast_var($2, $4); }
+    ref_opt id_list ":" fpar_type               { $$ = ast_fpar_def($1,$2, $4);  }
     
 
 ref_opt:
     /* empty */                                 { $$ = NULL; }
-    | T_REF                                     { $$ = ast_id($1); }
+    | T_REF                                     { $$ = ast_ref(); }
+
     
 
 id_list:
     T_ID                                        { $$ = ast_id($1); }
-    | id_list "," T_ID                          { $$ = ast_op(',', $1, $3); }
-    
+    | id_list "," T_ID                          { $$ = ast_sep(COMMA, $1, ast_id($3)); }
 
 fpar_type:
-    data_type arr_opt                           { $$ = ast_op(':', $1, $2); }
+    data_type arr_opt                           { $$ = ast_type_node($1, $2); }
+
     
 
 data_type:
-    T_INT                                       { $$ = ast_id($1); }
-    | T_CHAR                                    { $$ = ast_id($1); }
+    T_INT                                       { $$ = ast_data_type(INT); }
+    | T_CHAR                                    { $$ = ast_data_type(CHAR); }
     
 
 arr_opt:
-/* empty */                                     { $$ = NULL; }
-    | "[" "]"                                   {  }
-    | "[" T_NUM "]"                             {  }
-    
+    /* empty */                                 { $$ = NULL; }
+    | "[" "]"                                   { $$ = ast_array(0); } // represents an empty array
+    | "[" T_NUM "]"                             { $$ = ast_array($2); } // represents an array with size
+
 
 ret_type:
     data_type                                   { $$ = $1; }
-    | T_NOTHING                                 { $$ = ast_id($1); }
+    | T_NOTHING                                 { $$ = ast_nothing(); }
     
 
 
 local_defs:
-    /* empty */                                 {}
-    | local_defs local_def                      {}
+    /* empty */                                { $$ = NULL; }
+    | local_defs local_def                     { $$ = ast_local_defs($1, $2); }
     
 
 local_def:
-    func_def                                    {}
-    | func_decl                                 {}
-    | var_def                                   {}
+     func_def                                  { $$ = $1; }
+    | func_decl                                { $$ = $1; }
+    | var_def                                  { $$ = $1; }
     
 
 var_def:
-    T_VAR id_list ":" type ";"                  {}
+    T_VAR id_list ":" type ";"                  { $$ = ast_var($2, $4); }
     
 
 type:
-    data_type arr_opt                           {}
+    data_type arr_opt                           { $$ = $1; }
     
 
 func_decl:
-    header ";"                                  {}
+    header ";"                                   { $$ = $1; }
     
 
 stmt:
-    ";"                                         {}
-    | l_value "<-" expr ";"                     {}
-    | block                                     {  }
-    | func_call ";"                             {}
-    | T_IF cond T_THEN stmt else_opt            {}
-    | T_WHILE cond T_DO stmt                    {}
-    | T_RETURN expr_opt ";"                     {}
-    
+    ";"                                         { $$ = NULL; }
+    | l_value T_ASSIGN expr ";"                 { $$ = ast_op(ASSIGN, $1, $3); }
+    | block                                     { $$ = $1; }
+    | func_call ";"                             { $$ = $1; }
+    | T_IF cond T_THEN stmt else_opt            { $$ = ast_if($2, $4, $5); }
+    | T_WHILE cond T_DO stmt                    { $$ = ast_while($2, $4); }
+    | T_RETURN expr_opt ";"                     { $$ = ast_puts($2); }
 
 else_opt:
-    /* empty */                                 {  }
-    | T_ELSE stmt                               {}
-    
+    /* empty */                                 { $$ = NULL; }
+    | T_ELSE stmt                               { $$ = ast_else($2); }
+
 
 expr_opt:
-    /* empty */                                 {  }
-    | expr                                      {}
-    
+    /* empty */                                 { $$ = NULL; }
+    | expr                                      { $$ = $1; }
 
 block:
-    "{" stmts "}"                               {}
-    
+    "{" stmts "}"                               { $$ = ast_block($2);  }
 
 stmts:
-    /* empty */                                 {}
-    | stmts stmt                                {}
-    
+    /* empty */                                 { $$ = NULL; }
+    | stmts stmt                                { $$ = ast_stmts($1, $2); }
 
 func_call:          
-    T_ID "(" exprs ")"                          {}
-    
+    T_ID "(" exprs ")"                          { $$ = ast_func_call($1, $3); }
 
 exprs:
-    /* empty */                                 { }
-    | expr_list                                 {}
-    
+    /* empty */                                 { $$ = NULL; }
+    | expr_list                                 { $$ = $1;}
 
 expr_list:
-    expr                                        {}
-    | expr_list "," expr                        {}
-    
+    expr                                        { $$ = ast_arg_list($1, NULL); }
+    | expr_list "," expr                        { $$ = ast_arg_list($3, $1); }    // use ast_arg_list
+
 
 l_value:
-    T_ID                                        {}
-    | T_STR                                     {}
-    | l_value "[" expr "]"                      {}
-    
+    T_ID                                        { $$ = ast_id($1); }
+    | T_STR                                     { $$ = ast_str($1); } 
+    | l_value "[" expr "]"                      { $$ = ast_array_index($1, $3); }
 
 expr:
-    T_NUM                                       { }
-    | T_FIXED_CHAR                              {  }
-    | l_value                                   {}
-    | func_call                                 {}
-    | "(" expr ")"                              {}
-    | "+" expr                                  {  }
-    | "-" expr                                  {  }
-    | expr "+" expr                             { }
-    | expr "-" expr                             {  }
-    | expr "*" expr                             {  }
-    | expr T_DIV expr                           {  }
-    | expr T_MOD expr                           {  }
-    
+    T_NUM                                       { $$ = ast_num($1); }
+    | T_FIXED_CHAR                              { $$ = ast_char($1); }
+    | l_value                                   { $$ = $1; }
+    | func_call                                 { $$ = $1; }
+    | "(" expr ")"                              { $$ = $2; }
+    | "+" expr                                  { $$ = ast_op(POSITIVE, $2, NULL); }
+    | "-" expr                                  { $$ = ast_op(NEGATIVE, $2, NULL); }
+    | expr "+" expr                             { $$ = ast_op(PLUS, $1, $3); }
+    | expr "-" expr                             { $$ = ast_op(MINUS, $1, $3); }
+    | expr "*" expr                             { $$ = ast_op(MULTIPLY, $1, $3); }
+    | expr T_DIV expr                           { $$ = ast_op(DIV, $1, $3); }
+    | expr T_MOD expr                           { $$ = ast_op(MOD, $1, $3); }
 
 cond:
-    "(" cond ")"                                {}
-    | T_NOT cond                                {}
-    | cond T_AND cond                           {}
-    | cond T_OR cond                            {}
-    | expr "=" expr                             {}   
-    | expr "#" expr                             {}
-    | expr "<" expr                             {}
-    | expr ">" expr                             {}
-    | expr "<=" expr                            {}
-    | expr ">=" expr                            {}
+    "(" cond ")"                                { $$ = $2; }
+    | T_NOT cond                                { $$ = ast_op(NOT, $2, NULL); }
+    | cond T_AND cond                           { $$ = ast_op(AND, $1, $3); }
+    | cond T_OR cond                            { $$ = ast_op(OR, $1, $3); }
+    | expr "=" expr                             { $$ = ast_op(EQUAL, $1, $3); }   
+    | expr "#" expr                             { $$ = ast_op(NOT_EQUAL, $1, $3); }
+    | expr "<" expr                             { $$ = ast_op(LESS_THAN, $1, $3); }
+    | expr ">" expr                             { $$ = ast_op(GREATER_THAN, $1, $3); }
+    | expr "<=" expr                            { $$ = ast_op(LESS_EQUAL, $1, $3); }
+    | expr ">=" expr                            { $$ = ast_op(GREATER_EQUAL, $1, $3); }
+
     
 
 %%
