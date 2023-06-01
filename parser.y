@@ -20,6 +20,7 @@ void yyerror(const char *msg);
   char c;
   int n;
   char* str;
+  Type t;
 }
 
 %token T_AND T_CHAR T_DIV T_DO T_ELSE T_FUN T_IF T_INT T_MOD T_NOT T_NOTHING
@@ -89,10 +90,10 @@ ref_opt:
     | T_REF                                     { $$ = ast_ref(); }
 
     
-
 id_list:
     T_ID                                        { $$ = ast_id($1); }
-    | id_list "," T_ID                          { $$ = ast_sep(COMMA, $1, ast_id($3)); }
+    | id_list "," T_ID                          { $$ = ast_id_list($1, ast_id($3)); }
+
 
 fpar_type:
     data_type arr_opt                           { $$ = ast_type_node($1, $2); }
@@ -146,7 +147,7 @@ stmt:
     | func_call ";"                             { $$ = $1; }
     | T_IF cond T_THEN stmt else_opt            { $$ = ast_if($2, $4, $5); }
     | T_WHILE cond T_DO stmt                    { $$ = ast_while($2, $4); }
-    | T_RETURN expr_opt ";"                     { $$ = ast_puts($2); }
+    | T_RETURN expr_opt ";"                     { $$ = ast_return($2); }
 
 else_opt:
     /* empty */                                 { $$ = NULL; }

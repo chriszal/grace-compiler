@@ -104,8 +104,9 @@ union YYSTYPE
   char c;
   int n;
   char* str;
+  Type t;
 
-#line 109 "parser.h"
+#line 110 "parser.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

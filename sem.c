@@ -23,7 +23,7 @@ void ast_sem (ast a) {
     return;
   }
 
-  switch (a->type) {
+  switch (a->k) {
     case ID:
       {
         SymbolEntry *symEntry = lookup(a->data.c);
@@ -55,14 +55,14 @@ void ast_sem (ast a) {
       }
     case FUNCTION_DEF:
       {
-        // SymbolEntry *symEntry = insert(a->data.c, FUNCTION);
-        // if (symEntry == NULL) {
-        //   printf("Error inserting function: %s\n", a->data.str);
-        // } else {
-        //   ast_sem(a->left);  // Check the header
-        //   ast_sem(a->middle);  // Check local definitions
-        //   ast_sem(a->right);  // Check function body
-        // }
+        SymbolEntry *symEntry = insert(a->data.c, a->type);
+        if (symEntry == NULL) {
+          printf("Error inserting function: %s\n", a->data.str);
+        } else {
+          ast_sem(a->left);  // Check the header
+          ast_sem(a->middle);  // Check local definitions
+          ast_sem(a->right);  // Check function body
+        }
         return;
       }
     case EMPTY_STMTS:
@@ -77,7 +77,7 @@ void ast_sem (ast a) {
       }
     // Continue with the rest of your node types
     default:
-      printf("Unknown AST node type: %d\n", a->type);
+      printf("Unknown AST node type: %d\n", a->k);
       return;
   }
 }

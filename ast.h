@@ -1,6 +1,9 @@
 #ifndef AST_H
 #define AST_H
 
+#include "symbol.h"
+
+
 typedef enum {
     ID,
     NUM,
@@ -30,7 +33,6 @@ typedef enum {
     LOCAL_DEF,
     FPAR_DEF,
     FPAR_DEFS,
-    BRACKET,
     ASSIGN,
     GREATER_THAN,
     LESS_THAN,
@@ -52,11 +54,12 @@ typedef enum {
     ARRAY,
     ARG_LIST,
     TYPE,
-    ARRAY_INDEX
+    ARRAY_INDEX,
+    ID_LIST
 } ast_type;
 
 typedef struct node {
-    ast_type type;
+    ast_type k;
     union {
         char c;
         int num;
@@ -65,8 +68,11 @@ typedef struct node {
     struct node *left;
     struct node *middle;
     struct node *right;
+    Type type;
 } *ast;
 
+
+ast ast_id_list(ast l, ast r);
 ast ast_stmts(ast stmt, ast next);
 ast ast_empty_stmts();
 ast ast_function_def(ast header,ast local_defs, ast body);
@@ -91,6 +97,7 @@ ast ast_var(ast id, ast r);
 ast ast_char(char c);
 ast ast_nothing();
 ast ast_int();
+ast ast_return(ast e);
 ast ast_ref_list(ast l, ast r);
 ast ast_fun(char* str, ast l, ast r);
 ast ast_while(ast cond, ast stmt) ;

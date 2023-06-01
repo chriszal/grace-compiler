@@ -7,7 +7,7 @@ void print_ast(ast a) {
         return;
     }
 
-    switch (a->type) {
+    switch (a->k) {
         case ID:
             printf("ID(%s)", a->data.str);
             return;
@@ -71,7 +71,7 @@ void print_ast(ast a) {
             return;
         case FUNC_CALL:
             printf("FUNC_CALL(%s,", a->data.str);
-            if (a->left->type == EMPTY_STMTS) {
+            if (a->left->k == EMPTY_STMTS) {
                 printf("NO_PARAMS");
             } else {
                 print_ast(a->left);
@@ -127,7 +127,7 @@ void print_ast(ast a) {
             return;
         case FUN:
             printf("FUN(%s,", a->data.str);
-            if (a->left->type == EMPTY_STMTS) {
+            if (a->left->k == EMPTY_STMTS) {
                 printf("NO_PARAMS,");
             } else {
                 print_ast(a->left);
@@ -173,8 +173,8 @@ void print_ast(ast a) {
             print_ast(a->right);
             printf(")");
             return;
-        case PUTS:
-            printf("PUTS(");
+        case RETURN:
+            printf("RETURN(");
             print_ast(a->left);
             printf(")");
             return;
@@ -265,16 +265,18 @@ void print_ast(ast a) {
             printf(")");
             return;
 
-        case WHILE:
-            printf("WHILE(");
+        case ID_LIST:
+            printf("ID_LIST(");
             print_ast(a->left);
             printf(",");
             print_ast(a->right);
             printf(")");
             return;
-        case RETURN:
-            printf("RETURN(");
+        case WHILE:
+            printf("WHILE(");
             print_ast(a->left);
+            printf(",");
+            print_ast(a->right);
             printf(")");
             return;
         case AND:
@@ -342,7 +344,7 @@ void print_ast(ast a) {
 
         // Add cases for other node types
         default:
-            printf("Unknown AST node with type %d\n", a->type);
+            printf("Unknown AST node with type %d\n", a->k);
 
     }
 }
