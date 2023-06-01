@@ -13,6 +13,8 @@ extern int yyparse();
 extern int yylineno;
 
 void yyerror(const char *msg);
+
+ast p;
 %}
 
 %union {
@@ -219,7 +221,10 @@ void yyerror(const char *msg) {
 
 int main() { 
     int result = yyparse();
-    // if (result == 0) printf("Success.\n");
+    if (result != 0) fprintf(stderr, "Failure.\n");
+    initSymbolTable(999);
+    ast_sem(p);
+    destroySymbolTable();
     return result;
 }
 
