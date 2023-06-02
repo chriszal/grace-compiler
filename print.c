@@ -165,19 +165,6 @@ void print_ast(ast a) {
             printf(")");
             return;
 
-
-        case FOR:
-            printf("FOR(");
-            print_ast(a->left);
-            printf(",");
-            print_ast(a->right);
-            printf(")");
-            return;
-        case PUTS:
-            printf("PUTS(");
-            print_ast(a->left);
-            printf(")");
-            return;
         case IF:
             printf("IF(");
             print_ast(a->left);

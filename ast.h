@@ -15,7 +15,6 @@ typedef enum {
     NOTHING,
     INT,
     FUN,
-    FOR,
     PUTS,
     REF,
     IF,
@@ -85,7 +84,6 @@ ast ast_puts(ast e);
 ast ast_arg_list(ast arg, ast next);
 ast ast_if(ast cond, ast l, ast r);
 ast ast_else(ast stmt);
-ast ast_for(ast l, ast r);
 ast ast_block(ast l);
 ast ast_var(ast id, ast r);
 ast ast_char(char c);

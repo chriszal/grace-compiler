@@ -104,9 +104,6 @@ ast ast_puts(ast l) {
   return create_ast_node(PUTS, '\0', 0,NULL, l,NULL, NULL);
 }
 
-ast ast_for (ast l, ast r) {
-  return create_ast_node(FOR, '\0', 0,NULL, l,NULL, r);
-}
 
 ast ast_if (ast cond, ast l, ast r) {
   if (l == NULL) {

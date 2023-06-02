@@ -14,7 +14,7 @@ lexer.c: lexer.l parser.h
 	flex -o lexer.c lexer.l
 
 parser.c parser.h: parser.y
-	bison -H -o parser.c parser.y
+	bison -d -o parser.c parser.y
 
 clean:
 	rm -f *.o

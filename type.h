@@ -6,7 +6,7 @@ typedef struct Type_tag *Type;
 struct Type_tag {
     enum {
         TYPE_INT,
-        TYPE_CHAR,
+        TYPE_CHAR,//ref function
         TYPE_ARRAY_INT,
         TYPE_ARRAY_CHAR,
         TYPE_NOTHING

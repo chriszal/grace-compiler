@@ -178,12 +178,12 @@ expr_list:
 
 l_value:
     T_ID                                        { $$ = ast_id($1); }
-    | T_STR                                     { $$ = ast_str($1); } 
     | l_value "[" expr "]"                      { $$ = ast_array_index($1, $3); }
 
 expr:
     T_NUM                                       { $$ = ast_num($1); }
     | T_FIXED_CHAR                              { $$ = ast_char($1); }
+     | T_STR                                     { $$ = ast_str($1); } 
     | l_value                                   { $$ = $1; }
     | func_call                                 { $$ = $1; }
     | "(" expr ")"                              { $$ = $2; }
