@@ -7,4 +7,5 @@ fun solve ( ) : nothing
  }
  var NumberOfRings : int;
  {
+    return ;
  }

@@ -53,9 +53,6 @@ ast ast_function_def(ast header,ast local_defs, ast body) {
     return create_ast_node(FUNCTION_DEF, '\0', 0, NULL, header, local_defs, body,NULL);
 }
 
-ast ast_sep(ast_type sep, ast l, ast r) { 
-    return create_ast_node(sep, '\0', 0, NULL, l,NULL, r,NULL);
-}
 
 ast ast_id(char* str){
     return create_ast_node(ID, '\0', 0, str, NULL,NULL, NULL,NULL); 
@@ -81,11 +78,6 @@ ast ast_data_type(ast_type t) {
     return create_ast_node(t, '\0', 0, NULL, NULL,NULL, NULL,NULL);
 }
 
-ast ast_ref_list(ast l, ast r) {
-    return create_ast_node(REF_LIST, '\0', 0, NULL, l, NULL, r,NULL);
-}
-
-
 ast ast_fpar_def(ast ref, ast id_list, ast type) {
     return create_ast_node(FPAR_DEF, '\0', 0, NULL, ref, id_list, type,NULL);
 }
@@ -102,16 +94,6 @@ ast ast_op(ast_type op, ast l, ast r) {
   return create_ast_node(op, '\0', 0,NULL, l,NULL, r,NULL);
 }
 
-
-ast ast_puts(ast l) {
-  return create_ast_node(PUTS, '\0', 0,NULL, l,NULL, NULL,NULL);
-}
-
-
-
-ast ast_for (ast l, ast r) {
-  return create_ast_node(FOR, '\0', 0,NULL, l,NULL, r,NULL);
-}
 
 ast ast_if (ast cond, ast l, ast r) {
   if (l == NULL) {
@@ -169,6 +151,7 @@ ast ast_fun(char* str, ast l, ast r ) {
 ast ast_ref() {
     return create_ast_node(FPAR_DEF, '\0', 0, NULL, NULL, NULL, NULL,NULL);
 }
+
 
 ast ast_arg_list(ast arg, ast next) {
     if (next != NULL) {

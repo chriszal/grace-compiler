@@ -16,7 +16,6 @@ typedef struct SymbolEntry_tag SymbolEntry;
 
 struct SymbolEntry_tag {
         const char* id;
-        EntryType entryType;
         unsigned int nestingLevel;
         unsigned int hashValue;
         SymbolEntry* nextHash;

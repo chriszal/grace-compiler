@@ -18,17 +18,11 @@ typedef enum {
     NOTHING,
     INT,
     FUN,
-    FOR,
-    PUTS,
     REF,
     IF,
     ELSE,
     BLOCK,
-    DECL,
     FUNCTION_DEF,
-    SEMICOLON,
-    COMMA,
-    COLON,
     LOCAL_DEFS,
     LOCAL_DEF,
     FPAR_DEF,
@@ -50,7 +44,6 @@ typedef enum {
     NEGATIVE,
     POSITIVE,
     FUNC_CALL,
-    REF_LIST,
     ARRAY,
     ARG_LIST,
     TYPE,
@@ -76,7 +69,6 @@ ast ast_id_list(ast l, ast r);
 ast ast_stmts(ast stmt, ast next);
 ast ast_empty_stmts();
 ast ast_function_def(ast header,ast local_defs, ast body);
-ast ast_sep(ast_type sep, ast l, ast r);
 ast ast_id(char* str); 
 ast ast_num(int num);
 ast ast_local_defs(ast l, ast r);
@@ -87,7 +79,6 @@ ast ast_array(int size);
 ast ast_fpar_defs(ast l, ast r);
 ast ast_ref();
 ast ast_op(ast_type op, ast l, ast r);
-ast ast_puts(ast e);
 ast ast_arg_list(ast arg, ast next);
 ast ast_if(ast cond, ast l, ast r);
 ast ast_else(ast stmt);
@@ -98,7 +89,6 @@ ast ast_char(char c);
 ast ast_nothing();
 ast ast_int();
 ast ast_return(ast e);
-ast ast_ref_list(ast l, ast r);
 ast ast_fun(char* str, ast l, ast r);
 ast ast_while(ast cond, ast stmt) ;
 ast ast_str(char* str);

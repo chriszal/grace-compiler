@@ -106,16 +106,6 @@ void print_ast(ast a) {
             return;
 
 
-
-        case SEMICOLON:
-        case COMMA:
-        case COLON:
-            printf("(");
-            print_ast(a->left);
-            printf(",");
-            print_ast(a->right);
-            printf(")");
-            return;
         case INT:
             printf("INT");
             return;
@@ -155,8 +145,6 @@ void print_ast(ast a) {
             printf(")");
             return;
 
-
-
         case ARRAY_INDEX:
             printf("ARRAY_INDEX(");
             print_ast(a->left); // Array Variable
@@ -164,18 +152,13 @@ void print_ast(ast a) {
             print_ast(a->right); // Index
             printf(")");
             return;
-
-
-        case FOR:
-            printf("FOR(");
-            print_ast(a->left);
-            printf(",");
-            print_ast(a->right);
-            printf(")");
-            return;
         case RETURN:
             printf("RETURN(");
-            print_ast(a->left);
+            if (a->left != NULL) {
+                print_ast(a->left);
+            }else{
+                printf("EMPTY");
+            }
             printf(")");
             return;
         case IF:
@@ -198,13 +181,6 @@ void print_ast(ast a) {
             if (a->left != NULL) {
                 print_ast(a->left);
             }
-            printf(")");
-            return;
-        case DECL:
-            printf("DECL(");
-            print_ast(a->left);
-            printf(",");
-            print_ast(a->right);
             printf(")");
             return;
         case LOCAL_DEFS:
@@ -340,9 +316,6 @@ void print_ast(ast a) {
             print_ast(a->left);
             printf(")");
             return;
-
-
-        // Add cases for other node types
         default:
             printf("Unknown AST node with type %d\n", a->k);
 
