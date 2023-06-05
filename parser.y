@@ -4,9 +4,8 @@
 #include <stdlib.h>
 #include "ast.h"
 #include "print.h"
-#include "type.h"
-#include "symbol.h"
-#include "sem.h"
+#include "compile.h"
+
 
 extern int yylex();
 extern int yyparse();
@@ -14,7 +13,6 @@ extern int yylineno;
 
 void yyerror(const char *msg);
 
-ast p;
 %}
 
 %union {
@@ -22,7 +20,6 @@ ast p;
   char c;
   int n;
   char* str;
-  Type t;
 }
 
 %token T_AND T_CHAR T_DIV T_DO T_ELSE T_FUN T_IF T_INT T_MOD T_NOT T_NOTHING
@@ -66,11 +63,11 @@ ast p;
 %%
 
 program:
-    func_def                                   { print_ast($1);}
+    func_def                                   { ast_compile($1);}
     
 
 func_def:
-    header local_defs block                    { p = $$ = ast_function_def($1,$2, $3); }
+    header local_defs block                    { $$ = ast_function_def($1,$2, $3); }
     
 
 header:
@@ -222,9 +219,6 @@ void yyerror(const char *msg) {
 int main() { 
     int result = yyparse();
     if (result != 0) fprintf(stderr, "Failure.\n");
-    initSymbolTable(999);
-    ast_sem(p);
-    destroySymbolTable();
     return result;
 }
 

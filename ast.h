@@ -1,8 +1,6 @@
 #ifndef AST_H
 #define AST_H
 
-#include "symbol.h"
-
 
 typedef enum {
     ID,
@@ -61,7 +59,6 @@ typedef struct node {
     struct node *left;
     struct node *middle;
     struct node *right;
-    Type type;
 } *ast;
 
 

@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <string.h>
 %}
-%option debug
 %option noyywrap
 
 %x COMMENT
@@ -65,7 +64,7 @@ str_char    ({common_char}|{escape_seq})
 ">="          { return T_GREATER_EQUAL; }
 
 
-{l}({l}|{d}|_)* { yylval.str = strdup(yytext); printf("Token: ID, Value: %s\n", yylval.str); return T_ID; }
+{l}({l}|{d}|_)* { yylval.str = strdup(yytext); return T_ID; }
 {d}+            { yylval.n = atoi(yytext); return T_NUM; }
 '{fixed_char}'  { yylval.c = yytext[1]; return T_FIXED_CHAR; }
 \"{str_char}*\" { yylval.str = strdup(yytext); return T_STR; }
