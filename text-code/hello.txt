@@ -1,6 +1,6 @@
 fun hello ( ): nothing
- var NumberOfRings : int;
+ var x : int;
 {
-
+    x <- 5;
  puts("Hello world!\n");
 }

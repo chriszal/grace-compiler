@@ -52,7 +52,8 @@ ast p;
 %token<c> T_LESS_EQUAL "<="
 %token<c> T_GREATER_EQUAL ">="
 
-%type<node> func_def header fpar_defs fpar_def ref_opt id_list fpar_type data_type arr_opt ret_type local_defs local_def var_def type func_decl stmt else_opt expr_opt block stmts func_call exprs expr_list l_value expr cond
+%type<node> func_def header fpar_defs fpar_def ref_opt id_list fpar_type  arr_opt ret_type local_defs local_def var_def type func_decl stmt else_opt expr_opt block stmts func_call exprs expr_list l_value expr cond
+%type<t> data_type
 
 %expect 1
 %left T_OR
@@ -103,8 +104,8 @@ fpar_type:
     
 
 data_type:
-    T_INT                                       { $$ = ast_data_type(INT); }
-    | T_CHAR                                    { $$ = ast_data_type(CHAR); }
+    T_INT                                       {  $$ =  ast_data_type(INT); $$ = tyINT; }
+    | T_CHAR                                    {  $$ = ast_data_type(CHAR); $$ = tyCHAR; }
     
 
 arr_opt:
@@ -115,7 +116,7 @@ arr_opt:
 
 ret_type:
     data_type                                   { $$ = $1; }
-    | T_NOTHING                                 { $$ = ast_nothing(); }
+    | T_NOTHING                                 { $$ = ast_nothing(); ; $$ = tyNOTHING;}
     
 
 
@@ -223,6 +224,7 @@ int main() {
     int result = yyparse();
     if (result != 0) fprintf(stderr, "Failure.\n");
     initSymbolTable(999);
+    if ( p =! NULL) printf("Continue.\n");
     ast_sem(p);
     destroySymbolTable();
     return result;

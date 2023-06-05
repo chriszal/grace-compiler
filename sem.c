@@ -25,18 +25,13 @@ void ast_sem (ast a) {
 
   switch (a->k) {
     case VAR:{
-      SymbolEntry * e = lookup(a->data.c);
-      ast_sem(a->left);
-      if (!equalType(e->type, a->left->type))
-        error("type mismatch in assignment");
+      insert(a->data.c, a->type);
       return;
     }
     case ID:
       {
         SymbolEntry *symEntry = lookup(a->data.c);
-        if (symEntry == NULL) {
-          printf("Identifier not found: %s\n", a->data.str);
-        }
+        a->type = symEntry->type;
         return;
       }
     // case NUM:
@@ -50,16 +45,16 @@ void ast_sem (ast a) {
     //   ast_sem(a->left);
     //   ast_sem(a->right);
     //   return;
-    // case ASSIGN:
-    //   {
-    //     SymbolEntry *symEntry = lookup(a->left->data.c);
-    //     if (symEntry == NULL) {
-    //       printf("Identifier not found: %s\n", a->left->data.str);
-    //     } else {
-    //       ast_sem(a->right);
-    //     }
-    //     return;
-    //   }
+    case ASSIGN:
+      {
+        SymbolEntry *symEntry = lookup(a->left->data.c);
+        if (symEntry == NULL) {
+          printf("Identifier not found: %s\n", a->left->data.str);
+        } else {
+          ast_sem(a->right);
+        }
+        return;
+      }
     // case FUNCTION_DEF:
     // {
     //     SymbolEntry *symEntry = lookupEntry(a->data.c, 0);
