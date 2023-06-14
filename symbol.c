@@ -143,6 +143,15 @@ SymbolEntry * newEntry(const char * name, Type type)
     strcpy((char *) (e->id), name);
     e->hashValue    = PJW_hash(name) % hashTableSize;
     e->nestingLevel = currentScope->nestingLevel;
+    e->type = type;
+
+    if (type->kind == TYPE_ARRAY_CHAR) {
+       
+        e->u.arraySize = type->u.arraySize;
+        int arraySize =e->u.arraySize;
+        printf("Array size on insert: %d\n",arraySize);
+        
+    }
     insertEntry(e);
     return e;
 }

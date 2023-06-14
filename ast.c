@@ -57,9 +57,7 @@ ast ast_function_def(ast header,ast local_defs, ast body) {
 ast ast_id(char* str){
     return create_ast_node(ID, '\0', 0, str, NULL,NULL, NULL,NULL); 
 }    
-ast ast_array(int size){
-    return create_ast_node(ARRAY, '\0', size, NULL, NULL, NULL, NULL,NULL);
-}
+
 
 ast ast_local_defs(ast l, ast r) {
     if (l == NULL) {
@@ -74,12 +72,12 @@ ast ast_local_def(ast l) {
     return create_ast_node(LOCAL_DEF, '\0', 0, NULL, l,NULL, NULL,NULL);
 }
 
-ast ast_data_type(ast_type t) {
-    return create_ast_node(t, '\0', 0, NULL, NULL,NULL, NULL,NULL);
+ast ast_data_type(ast_type k,Type type) {
+    return create_ast_node(k, '\0', 0, NULL, NULL,NULL, NULL,type);
 }
 
-ast ast_fpar_def(ast ref, ast id_list, ast type) {
-    return create_ast_node(FPAR_DEF, '\0', 0, NULL, ref, id_list, type,NULL);
+ast ast_fpar_def(ast ref, ast id_list, Type type) {
+    return create_ast_node(FPAR_DEF, '\0', 0, NULL, ref, id_list, NULL,type);
 }
 
 ast ast_fpar_defs(ast l, ast r) {
@@ -142,11 +140,11 @@ ast ast_int() {
     return create_ast_node(INT, '\0', 0, NULL, NULL,NULL, NULL,NULL);
 }
 
-ast ast_fun(char* str, ast l, ast r ) {
+ast ast_fun(char* str, ast l, Type t ) {
     if (l == NULL) {
         l = create_ast_node(EMPTY_STMTS, '\0', 0, NULL, NULL,NULL, NULL,NULL);
     }
-    return create_ast_node(FUN, '\0', 0, str, l,NULL, r,NULL);
+    return create_ast_node(FUN, '\0', 0, str, l,NULL, NULL,t);
 }
 ast ast_ref() {
     return create_ast_node(FPAR_DEF, '\0', 0, NULL, NULL, NULL, NULL,NULL);
@@ -159,9 +157,7 @@ ast ast_arg_list(ast arg, ast next) {
     }
     return create_ast_node(ARG_LIST, '\0', 0, NULL, arg, NULL, NULL,NULL);
 }
-ast ast_array_index(ast id, ast index){
-    return create_ast_node(ARRAY_INDEX, '\0', 0, NULL, id, NULL, index,NULL);
-}
+
 
 
 ast ast_while(ast cond, ast stmt) {
@@ -178,9 +174,31 @@ ast ast_func_call(char* str, ast args) {
     return create_ast_node(FUNC_CALL, '\0', 0, str, args, NULL, NULL,NULL);
 }
 
-ast ast_type_node(ast data_type, ast array) {
-    return create_ast_node(TYPE, '\0', 0, NULL, data_type, array, NULL,NULL);
+ast ast_array_index(ast id, ast index){
+    return create_ast_node(ARRAY_INDEX, '\0', 0, NULL, id, NULL, index,NULL);
 }
+ast ast_array(int size){
+    
+    return create_ast_node(ARRAY, '\0', size, NULL, NULL, NULL, NULL,NULL);
+}
+
+ast ast_type_node(ast data_type, ast array) {
+    if (array == NULL){
+        return create_ast_node(TYPE, '\0', 0, NULL, data_type, array, NULL,NULL);
+    }else { 
+        if (data_type->type == tyINT) {
+            tyARRAY_INT->u.arraySize = array->data.num;
+            return create_ast_node(TYPE, '\0', 0, NULL, data_type, array, NULL, tyARRAY_INT);
+        }
+        else {
+            
+            tyARRAY_CHAR->u.arraySize = array->data.num;
+            return create_ast_node(TYPE, '\0', array->data.num, NULL, data_type, array, NULL, tyARRAY_CHAR);
+        }
+    }
+}
+
+
 
 
 

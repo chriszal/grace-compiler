@@ -1015,12 +1015,15 @@ YY_RULE_SETUP
 case 41:
 YY_RULE_SETUP
 #line 70 "lexer.l"
-{ yylval.str = strdup(yytext); return T_STR; }
+{ 
+                    yylval.str = strndup(yytext + 1, yyleng - 2); 
+                    return T_STR; 
+                }
 	YY_BREAK
 case 42:
 /* rule 42 can match eol */
 YY_RULE_SETUP
-#line 72 "lexer.l"
+#line 76 "lexer.l"
 {
                     if (*yytext == '\n') {
                         ++yylineno;
@@ -1029,46 +1032,46 @@ YY_RULE_SETUP
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 78 "lexer.l"
+#line 82 "lexer.l"
 { }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 80 "lexer.l"
+#line 84 "lexer.l"
 { BEGIN(COMMENT);}
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 82 "lexer.l"
+#line 86 "lexer.l"
 { BEGIN(INITIAL);}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 83 "lexer.l"
+#line 87 "lexer.l"
 { }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 84 "lexer.l"
+#line 88 "lexer.l"
 { }
 	YY_BREAK
 case 48:
 /* rule 48 can match eol */
 YY_RULE_SETUP
-#line 85 "lexer.l"
+#line 89 "lexer.l"
 {++yylineno;  }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 87 "lexer.l"
+#line 91 "lexer.l"
 { printf("Illegal token\n"); exit(1); }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 91 "lexer.l"
+#line 95 "lexer.l"
 ECHO;
 	YY_BREAK
-#line 1072 "lexer.c"
+#line 1075 "lexer.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT):
 	yyterminate();
@@ -2074,6 +2077,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 91 "lexer.l"
+#line 95 "lexer.l"
 
 

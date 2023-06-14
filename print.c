@@ -66,7 +66,7 @@ void print_ast(ast a) {
             printf("VAR(");
             print_ast(a->left);  
             printf(",");
-            print_ast(a->right); 
+            print_ast(a->type); 
             printf(")");
             return;
         case FUNC_CALL:
@@ -123,7 +123,7 @@ void print_ast(ast a) {
                 print_ast(a->left);
                 printf(",");
             }
-            print_ast(a->right);
+            print_ast(a->type);
             printf(")");
             return;
         case REF:

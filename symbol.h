@@ -14,14 +14,24 @@ typedef enum {
 
 typedef struct SymbolEntry_tag SymbolEntry;
 
+typedef union EntryDetails_tag {
+    int arraySize; // Used when the symbol represents an array
+    int functionParameters; // Used when the symbol represents a function
+    // ... other fields, as needed
+} EntryDetails;
+
+
 struct SymbolEntry_tag {
         const char* id;
+        EntryType entryType;
         unsigned int nestingLevel;
         unsigned int hashValue;
         SymbolEntry* nextHash;
         SymbolEntry* nextInScope;
 
         Type type;
+        EntryDetails u;
+
 };
 
 typedef struct Scope_tag Scope;

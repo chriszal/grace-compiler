@@ -33,9 +33,6 @@ extern const Type tyARRAY_INT;
 extern const Type tyARRAY_CHAR;
 extern const Type tyNOTHING;
 
-Type newFunctionType(TypeList params, Type returnType);
-void freeFunctionType(Type type);
-
 int equalType(Type type1, Type type2);
 void printType(Type type);
 

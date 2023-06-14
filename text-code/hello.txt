@@ -1,6 +1,8 @@
 fun hello ( ): nothing
- var x : int;
+ var xe : int;
+ var x :int;
 {
-    x <- 5;
+    x <- -1;
+    xe <- x-5;
  puts("Hello world!\n");
 }

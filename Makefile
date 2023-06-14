@@ -1,6 +1,6 @@
 .PHONY: minibasic
 
-minibasic: lexer.o parser.o ast.o sem.o symbol.o type.o error.o print.o
+minibasic: lexer.o parser.o ast.o sem.o symbol.o type.o error.o 
 	$(CC) $^ -o $@
 
 lexer.o: ast.h
