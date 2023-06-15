@@ -207,6 +207,54 @@ void ast_sem(ast a)
     printf("Finished NEGATIVE operation.\n");
     return;
   }
+    case IF:
+  {
+    printf("Processing IF operation.\n");
+
+    // Semantic check for condition
+    ast_sem(a->left->left);
+    printf("Type of if condition: ");
+    printType(a->left->left->type );
+    printf("\n");
+    if (a->left->left->type != tyINT) 
+    {
+      error("Invalid type in condition of if statement");
+      return;
+    }
+
+    // Semantic check for THEN branch
+    ast_sem(a->middle);
+
+    // Semantic check for ELSE branch
+    if (a->right != NULL) {
+        ast_sem(a->right);
+    }
+
+    printf("Finished IF operation.\n");
+    return;
+  }
+    case WHILE:
+  {
+    printf("Processing WHILE operation.\n");
+
+    // Semantic check for condition
+    ast_sem(a->left->left);
+    printf("Type of while right condition: ");
+    printType(a->left->left->type );
+    printf("\n");
+    if (a->left->left->type != tyINT) 
+    {
+      error("Invalid type in condition of while statement");
+      return;
+    }
+
+    // Semantic check for the statement inside the loop
+    ast_sem(a->right->right);
+
+    printf("Finished WHILE operation.\n");
+    return;
+  }
+
 
   case PLUS:
   {
@@ -345,9 +393,11 @@ void ast_sem(ast a)
     return;
   }
   default:
+    openScope();
     ast_sem(a->left);
     ast_sem(a->middle);
     ast_sem(a->right);
+    closeScope();
     return;
   }
 }

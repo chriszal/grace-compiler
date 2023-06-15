@@ -2,5 +2,5 @@ fun hello ( ): int
  var xe, x ,y: int;
 {
     x <- -1;
-    xe <- x ;
+    xe <- x + 4 ;
 }

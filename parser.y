@@ -50,7 +50,7 @@ ast p;
 %token<c> T_LESS_EQUAL "<="
 %token<c> T_GREATER_EQUAL ">="
 
-%type<node> func_def header fpar_defs fpar_def ref_opt id_list  local_defs local_def var_def func_decl stmt else_opt expr_opt block stmts func_call exprs expr_list l_value expr cond data_type ret_type type arr_opt fpar_type
+%type<node> arr_dims func_def header fpar_defs fpar_def ref_opt id_list  local_defs local_def var_def func_decl stmt else_opt expr_opt block stmts func_call exprs expr_list l_value expr cond data_type ret_type type arr_opt fpar_type
 
 %expect 1
 %left T_OR
@@ -101,11 +101,15 @@ data_type:
     | T_CHAR                                    { $$ = ast_data_type(CHAR,tyCHAR); }
     
 
+arr_dims:
+    "[" "]"                                     { $$ = ast_array(0); }
+    | "[" T_NUM "]"                             { $$ = ast_array($2); }
+    | arr_dims "[" "]"                          { $$ = ast_array_dim($$, 0); }
+    | arr_dims "[" T_NUM "]"                    { $$ = ast_array_dim($$, $3); };
+
 arr_opt:
     /* empty */                                 { $$ = NULL; }
-    | "[" "]"                                   { $$ = ast_array(0); } // represents an empty array
-    | "[" T_NUM "]"                             { $$ = ast_array($2); } // represents an array with size
-
+    | arr_dims                                  { $$ = $1; };
 
 ret_type:
     data_type                                   { $$ = $1; }
@@ -218,9 +222,7 @@ int main() {
     int result = yyparse();
     if (result != 0) fprintf(stderr, "Failure.\n");
     initSymbolTable(999);
-    openScope();
     ast_sem(p);
-    closeScope();
     destroySymbolTable();
     return result;
 }

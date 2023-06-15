@@ -86,6 +86,7 @@ ast ast_for(ast l, ast r);
 ast ast_block(ast l);
 ast ast_var(ast id, ast r);
 ast ast_char(char c);
+ast ast_array_dim(ast a, int size);
 ast ast_nothing();
 ast ast_int();
 ast ast_return(ast e);

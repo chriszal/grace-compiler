@@ -92,6 +92,11 @@ ast ast_op(ast_type op, ast l, ast r) {
   return create_ast_node(op, '\0', 0,NULL, l,NULL, r,NULL);
 }
 
+ast ast_array_dim(ast a, int size){
+    ast n = create_ast_node(ARRAY, '\0', size, NULL, NULL, NULL, NULL,NULL);
+    a->right = n; // connect the new dimension node to the previous dimensions
+    return a;
+}
 
 ast ast_if (ast cond, ast l, ast r) {
   if (l == NULL) {

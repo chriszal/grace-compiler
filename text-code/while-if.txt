@@ -1,0 +1,14 @@
+fun hello ( ): int
+ var xe, x : int;
+{
+    x <- 10;
+    xe <- 1 ;
+    while xe < -16 do {
+        
+        xe <- xe+1;
+    }
+
+    if x >= 1 then {
+        x <- -1;
+    }
+}

@@ -19,6 +19,10 @@ struct Type_tag {
     } kind;
     
     union {
+        struct {
+            int numDims;
+            int *arraySizes;
+        };
         int arraySize; 
         struct {
             TypeList params;
