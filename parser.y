@@ -7,7 +7,6 @@
 #include "symbol.h"
 #include "sem.h"
 
-extern int yylex();
 extern int yyparse();
 extern int yylineno;
 

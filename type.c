@@ -16,6 +16,14 @@ const Type tyARRAY_INT = &(typeConst[2]);
 const Type tyARRAY_CHAR = &(typeConst[3]);
 const Type tyNOTHING = &(typeConst[4]);
 
+Type createFunctionType(Type returnType, TypeList params) {
+    Type t = (Type)malloc(sizeof(struct Type_tag));
+    t->kind = TYPE_FUNCTION;
+    t->u.function.returnType = returnType;
+    t->u.function.params = params;
+    return t;
+}
+
 
 int equalType(Type type1, Type type2) {
      if (type1->kind == type2->kind) {

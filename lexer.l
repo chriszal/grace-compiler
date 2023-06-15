@@ -1,5 +1,5 @@
 %{
-#define YY_DECL int yylex(void)
+
 
 #include <stdlib.h>
 #include "ast.h"

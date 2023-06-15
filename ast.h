@@ -89,7 +89,7 @@ ast ast_char(char c);
 ast ast_nothing();
 ast ast_int();
 ast ast_return(ast e);
-ast ast_fun(char* str, ast l, Type t);
+ast ast_fun(char* str, ast l, ast t);
 ast ast_while(ast cond, ast stmt) ;
 ast ast_str(char* str);
 ast ast_func_call(char* str, ast args);

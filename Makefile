@@ -1,5 +1,8 @@
 .PHONY: minibasic
 
+CC = gcc
+CFLAGS = -Wall -Wextra -g
+
 minibasic: lexer.o parser.o ast.o sem.o symbol.o type.o error.o 
 	$(CC) $^ -o $@
 
@@ -22,6 +25,5 @@ clean:
 distclean: clean
 	rm -f minibasic lexer.c parser.c parser.h
 
-
 run: minibasic
-	./minibasic < $(INPUT)
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes ./minibasic < $(INPUT)

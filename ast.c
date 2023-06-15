@@ -140,11 +140,11 @@ ast ast_int() {
     return create_ast_node(INT, '\0', 0, NULL, NULL,NULL, NULL,NULL);
 }
 
-ast ast_fun(char* str, ast l, Type t ) {
+ast ast_fun(char* str, ast l, ast r ) {
     if (l == NULL) {
         l = create_ast_node(EMPTY_STMTS, '\0', 0, NULL, NULL,NULL, NULL,NULL);
     }
-    return create_ast_node(FUN, '\0', 0, str, l,NULL, NULL,t);
+    return create_ast_node(FUN, '\0', 0, str, l,NULL, r,NULL);
 }
 ast ast_ref() {
     return create_ast_node(FPAR_DEF, '\0', 0, NULL, NULL, NULL, NULL,NULL);

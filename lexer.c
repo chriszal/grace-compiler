@@ -525,7 +525,7 @@ int yy_flex_debug = 0;
 char *yytext;
 #line 1 "lexer.l"
 #line 2 "lexer.l"
-#define YY_DECL int yylex(void)
+
 
 #include <stdlib.h>
 #include "ast.h"

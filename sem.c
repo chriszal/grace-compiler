@@ -20,6 +20,19 @@ SymbolEntry *insert(char *name, Type t)
   printf("\n");
   return newEntry(name, t);
 }
+void process_id_list(ast a, Type type)
+{
+  if (a->k == ID)
+  {
+    printf("Non Array type provided. Inserting into symbol table...\n");
+    insert(a->data.str, type);
+  }
+  else if (a->k == ID_LIST)
+  {
+    process_id_list(a->left, type);
+    process_id_list(a->right, type);
+  }
+}
 
 void ast_sem(ast a)
 {
@@ -31,28 +44,63 @@ void ast_sem(ast a)
 
   switch (a->k)
   {
+
+  case FUN:
+  {
+    printf("Entering FUNCTION declaration.\n");
+
+    // Handle the function's parameter types and return type
+    Type returnType = a->right->type;
+    // Handle the function's parameter types
+    TypeList params = NULL; // Initialize params to NULL
+    // TODO: Traverse the part of AST that holds function parameters
+    // and create TypeList `params` accordingly
+
+    // Check if params are NULL (meaning no parameters)
+    if (params == NULL)
+    {
+      printf("Function has no parameters.\n");
+    }
+
+    // Create the function type
+    Type functionType = createFunctionType(returnType, params);
+
+    // Insert the function name into the symbol table
+    insert(a->data.str, functionType);
+
+    // Check the function's return type
+    if (a->right->type != tyNOTHING && a->right->type != tyINT && a->right->type != tyCHAR)
+    {
+      error("Invalid function return type");
+      return;
+    }
+    printf("Finished FUNCTION declaration.\n");
+    return;
+  }
+
   case VAR:
   {
     printf("Entering VAR declaration\n");
-    ast id_node = a->left;
-    printf("First id: %s\n",id_node->left->left->data.str);
-    printf("Second id: %s\n",id_node->left->right->data.str);
-    printf("Third id: %s\n",id_node->right->data.str);
-    
+    ast id_list_node = a->left;
+    Type type;
+
+    // Check if array type or not
     if (a->right->middle == NULL)
     {
-      printf("Non Array type provided. Inserting into symbol table...\n");
-      insert(a->left->data.str, a->right->left->type);
+      type = a->right->left->type;
     }
     else
     {
-      printf("Array type provided. Inserting into symbol table...\n");
-      insert(a->left->data.str, a->right->type);
+      type = a->right->type;
     }
+
+    // Process the ID list
+    process_id_list(id_list_node, type);
 
     printf("Finished VAR declaration.\n");
     return;
   }
+
   case ID:
   {
     printf("Processing ID operation.\n");
