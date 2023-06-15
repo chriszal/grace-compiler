@@ -51,8 +51,7 @@ ast p;
 %token<c> T_LESS_EQUAL "<="
 %token<c> T_GREATER_EQUAL ">="
 
-%type<node> func_def header fpar_defs fpar_def ref_opt id_list  local_defs local_def var_def func_decl stmt else_opt expr_opt block stmts func_call exprs expr_list l_value expr cond
-%type<t> data_type ret_type type arr_opt fpar_type
+%type<node> func_def header fpar_defs fpar_def ref_opt id_list  local_defs local_def var_def func_decl stmt else_opt expr_opt block stmts func_call exprs expr_list l_value expr cond data_type ret_type type arr_opt fpar_type
 
 %expect 1
 %left T_OR

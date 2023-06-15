@@ -34,7 +34,11 @@ void ast_sem(ast a)
   case VAR:
   {
     printf("Entering VAR declaration\n");
-
+    ast id_node = a->left;
+    printf("First id: %s\n",id_node->left->left->data.str);
+    printf("Second id: %s\n",id_node->left->right->data.str);
+    printf("Third id: %s\n",id_node->right->data.str);
+    
     if (a->right->middle == NULL)
     {
       printf("Non Array type provided. Inserting into symbol table...\n");
@@ -49,6 +53,26 @@ void ast_sem(ast a)
     printf("Finished VAR declaration.\n");
     return;
   }
+  case ID:
+  {
+    printf("Processing ID operation.\n");
+
+    SymbolEntry *e = lookup(a->data.str);
+
+    if (e == NULL)
+    {
+      error("undefined identifier");
+      return;
+    }
+
+    a->type = e->type;
+    printf("Found type: ");
+    printType(a->type);
+    printf("\n");
+    printf("Finished ID operation.\n");
+    return;
+  }
+
   case NUM:
     a->type = tyINT;
     return;
@@ -63,51 +87,57 @@ void ast_sem(ast a)
   case ASSIGN:
   {
     printf("Processing ASSIGN operation.\n");
-    // check if l_value is type of array and not just id
-    if (a->left->k == ARRAY_INDEX)
+
+    ast_sem(a->left);
+    ast_sem(a->right);
+
+    if (!equalType(a->left->type, a->right->type))
     {
-      ast_sem(a->left->left);
+      error("type mismatch in assignment");
+    }
 
-      SymbolEntry *symEntry = lookup(a->left->left->data.str); // Get the SymbolEntry for the array
-      ast_sem(a->left->right);
-      int index = a->left->right->data.num; // Get the index
-
-      printf("Index of array is: %d\n", index);
-      printf("Size of saved array is: %d\n", symEntry->type->u.arraySize);
-
-      ast_sem(a->right);
-      if (index >= symEntry->type->u.arraySize || index < 0)
+    if (a->left->type->kind == TYPE_ARRAY_CHAR)
+    {
+      int arraySize = a->left->type->u.arraySize;
+      int strLength = strlen(a->right->data.str);
+      if (strLength != arraySize)
       {
-        error("array index out of bounds"); // Check if index is within the bounds of the array
-      }
-      else if (!equalType(symEntry->type, a->right->type))
-      {
-        error("type mismatch in array assignment"); // Check if the type of a->right matches the type of the array elements
+        error("incorrect string length in assignment");
       }
     }
-    else
-    {
-      // ast_sem(a->left);
-      
-      SymbolEntry *symEntry = lookup(a->left->data.str);
-      ast_sem(a->right);
-      printf("Error1\n");
-      if (equalType(symEntry->type, a->right->type) == 0)
-        error("type mismatch in assignment");
-      printf("Error2\n");
-      if (symEntry->type->kind == TYPE_ARRAY_CHAR)
-      {
-        int arraySize = symEntry->u.arraySize;
-        int strLength = strlen(a->right->data.str);
-        if (strLength != arraySize)
-        {
-          error("incorrect string length in assignment");
-        }
-      }
-    }
+
     printf("Finished ASSIGN operation.\n");
     return;
   }
+
+  case ARRAY_INDEX:
+  {
+    printf("Processing ARRAY_INDEX operation.\n");
+
+    ast_sem(a->left);
+    ast_sem(a->right);
+
+    int index = a->right->data.num; // Get the index
+    printf("Index of array is: %d\n", index);
+
+    if (a->left->type->kind != TYPE_ARRAY_INT && a->left->type->kind != TYPE_ARRAY_CHAR)
+    {
+      error("invalid operation on non-array type");
+    }
+
+    printf("Size of saved array is: %d\n", a->left->type->u.arraySize);
+
+    if (index >= a->left->type->u.arraySize || index < 0)
+    {
+      error("array index out of bounds"); // Check if index is within the bounds of the array
+    }
+
+    a->type = (a->left->type->kind == TYPE_ARRAY_INT) ? tyINT : tyCHAR;
+
+    printf("Finished ARRAY_INDEX operation.\n");
+    return;
+  }
+
   case POSITIVE:
   {
     printf("Processing POSITIVE operation. Operand: %d\n", a->left->data.num);
@@ -130,102 +160,98 @@ void ast_sem(ast a)
     return;
   }
 
-  case PLUS:{
+  case PLUS:
+  {
     printf("Processing PLUS operation.\n");
     ast_sem(a->left);
     ast_sem(a->right);
-    SymbolEntry *symEntry = lookup(a->left->data.str);
+
     printf("Left operand type: ");
-    printType(symEntry->type);
+    printType(a->left->type);
     printf("\n");
 
     printf("Right operand type: ");
     printType(a->right->type);
     printf("\n");
 
-
-    if (!equalType(symEntry->type, a->right->type) ||symEntry->type->kind != TYPE_INT)
+    if (!equalType(a->left->type, a->right->type) || a->left->type->kind != TYPE_INT)
     {
       error("type mismatch in + operation");
     }
-
-    // a->data.num = a->left->data.num + a->right->data.num;
-    // a->type = tyINT;
-    // printf("PLUS operation result: %d\n", a->data.num);
-    // printf("Finished PLUS operation.\n");
-
+    a->type = a->left->type;
+    printf("Finished PLUS operation with result type: ");
+    printType(a->type);
+    printf("\n");
     return;
   }
-  case MINUS:{
+  case MINUS:
+  {
     printf("Entering MINUS operation\n");
+
     ast_sem(a->left);
     ast_sem(a->right);
-    SymbolEntry *symEntry = lookup(a->left->data.str);
+
     printf("Left operand type: ");
-    printType(symEntry->type);
+    printType(a->left->type);
     printf("\n");
 
     printf("Right operand type: ");
     printType(a->right->type);
     printf("\n");
 
-    if (!equalType(symEntry->type, a->right->type) || symEntry->type->kind != TYPE_INT)
+    if (!equalType(a->left->type, a->right->type) || a->left->type->kind != TYPE_INT)
     {
       error("type mismatch in - operation");
     }
 
-    // a->data.num = a->left->data.num - a->right->data.num;
-    // a->type = tyINT;
-
-    // printf("Result: %d\n", a->data.num);
-    // printf("Leaving MINUS operation\n");
+    a->type = a->left->type;
+    printf("Finished MINUS operation with result type: ");
+    printType(a->type);
+    printf("\n");
 
     return;
   }
 
-  case MULTIPLY:{
+  case MULTIPLY:
+  {
     printf("Entering MULTIPLY operation\n");
     ast_sem(a->left);
     ast_sem(a->right);
 
-    SymbolEntry *symEntry = lookup(a->left->data.str);
     printf("Left operand type: ");
-    printType(symEntry->type);
+    printType(a->left->type);
     printf("\n");
 
     printf("Right operand type: ");
     printType(a->right->type);
     printf("\n");
 
-    if (!equalType(symEntry->type, a->right->type) || symEntry->type->kind != TYPE_INT)
+    if (!equalType(a->left->type, a->right->type) || a->left->type->kind != TYPE_INT)
     {
       error("type mismatch in * operation");
     }
-
-    // a->data.num = a->left->data.num * a->right->data.num;
-    // a->type = tyINT;
-
-    // printf("Result: %d\n", a->data.num);
-    // printf("Leaving MULTIPLY operation\n");
+    a->type = a->left->type;
+    printf("Finished MULTIPLY operation with result type: ");
+    printType(a->type);
+    printf("\n");
 
     return;
   }
-  case DIV:{
+  case DIV:
+  {
     printf("Entering DIV operation\n");
     ast_sem(a->left);
     ast_sem(a->right);
 
-    SymbolEntry *symEntry = lookup(a->left->data.str);
     printf("Left operand type: ");
-    printType(symEntry->type);
+    printType(a->left->type);
     printf("\n");
 
     printf("Right operand type: ");
     printType(a->right->type);
     printf("\n");
 
-
-    if (!equalType(symEntry->type, a->right->type) || symEntry->type->kind != TYPE_INT)
+    if (!equalType(a->left->type, a->right->type) || a->left->type->kind != TYPE_INT)
     {
       error("type mismatch in / operation");
     }
@@ -234,31 +260,27 @@ void ast_sem(ast a)
     {
       error("division by zero");
     }
-
-    // a->data.num = a->left->data.num / a->right->data.num;
-    // a->type = tyINT;
-
-    // printf("Result: %d\n", a->data.num);
-    // printf("Leaving DIV operation\n");
-
+    a->type = a->left->type;
+    printf("Finished DIV operation with result type: ");
+    printType(a->type);
+    printf("\n");
     return;
   }
-  case MOD:{
+  case MOD:
+  {
     printf("Entering MOD operation\n");
     ast_sem(a->left);
     ast_sem(a->right);
 
-    SymbolEntry *symEntry = lookup(a->left->data.str);
     printf("Left operand type: ");
-    printType(symEntry->type);
+    printType(a->left->type);
     printf("\n");
 
     printf("Right operand type: ");
     printType(a->right->type);
     printf("\n");
 
-
-    if (!equalType(symEntry->type, a->right->type) || symEntry->type->kind != TYPE_INT)
+    if (!equalType(a->left->type, a->right->type) || a->left->type->kind != TYPE_INT)
     {
       error("type mismatch in mod operation");
     }
@@ -267,12 +289,10 @@ void ast_sem(ast a)
     {
       error("division by zero");
     }
-
-    // a->data.num = a->left->data.num % a->right->data.num;
-    // a->type = tyINT;
-
-    // printf("Result: %d\n", a->data.num);
-    // printf("Leaving MOD operation\n");
+    a->type = a->left->type;
+    printf("Finished MOD operation with result type: ");
+    printType(a->type);
+    printf("\n");
 
     return;
   }
