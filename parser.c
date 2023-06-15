@@ -1465,7 +1465,7 @@ yyreduce:
     {
   case 2:
 #line 66 "parser.y"
-                                               { ast_compile((yyvsp[0].node));}
+                                               { print_ast((yyvsp[0].node));}
 #line 1470 "parser.c"
     break;
 

@@ -63,7 +63,7 @@ void yyerror(const char *msg);
 %%
 
 program:
-    func_def                                   { ast_compile($1);}
+    func_def                                   { print_ast($1);}
     
 
 func_def:

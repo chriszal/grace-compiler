@@ -1,6 +1,7 @@
 fun hello ( ): nothing
- var NumberOfRings : int;
+ var xe, x ,y: int;
 {
-
- puts("Hello world!\n");
+    x <- -1;
+    xe <- x + 5;
+    puts("Hello world!\n");
 }
