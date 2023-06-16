@@ -1,11 +1,11 @@
-fun hello ( rings : int): int
-    fun hanoi (y,d : int) : nothing
+fun hello ( ): int
+    fun hanoi () : nothing
     
     {
     
     }
     var xe, x ,y: int;
     {
-        rings <- -1;
+        x <- -1;
         xe <- x + 4 ;
     }

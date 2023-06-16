@@ -11,6 +11,17 @@ make
 ```
 INPUT=your_input_file.txt make run
 ```
+## Not finished on semantic
+
+- checks for multiple dimention arrays
+- scopes are messed up
+- func calls
+- multipe func defs
+- ref
+- blocks, else, do , then?
+
+
+
 ## Lexer
 
 ### 1. Header section:

@@ -74,7 +74,7 @@ ast ast_num(int num);
 ast ast_local_defs(ast l, ast r);
 ast ast_local_def(ast l);
 ast ast_data_type(ast_type k,Type t);
-ast ast_fpar_def(ast ref, ast id_list, Type type) ;
+ast ast_fpar_def(ast ref, ast id_list, ast r) ;
 ast ast_array(int size);
 ast ast_fpar_defs(ast l, ast r);
 ast ast_ref();

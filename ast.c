@@ -76,8 +76,8 @@ ast ast_data_type(ast_type k,Type type) {
     return create_ast_node(k, '\0', 0, NULL, NULL,NULL, NULL,type);
 }
 
-ast ast_fpar_def(ast ref, ast id_list, Type type) {
-    return create_ast_node(FPAR_DEF, '\0', 0, NULL, ref, id_list, NULL,type);
+ast ast_fpar_def(ast ref, ast id_list, ast r) {
+    return create_ast_node(FPAR_DEF, '\0', 0, NULL, ref, id_list, r,NULL);
 }
 
 ast ast_fpar_defs(ast l, ast r) {

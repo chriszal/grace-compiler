@@ -2146,7 +2146,9 @@ int main() {
     int result = yyparse();
     if (result != 0) fprintf(stderr, "Failure.\n");
     initSymbolTable(999);
+    openScope();
     ast_sem(p);
+    closeScope();
     destroySymbolTable();
     return result;
 }

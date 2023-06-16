@@ -1,0 +1,11 @@
+fun hello ( rings,delta : int): int
+    fun hanoi (y,d : int) : nothing
+    
+    {
+    
+    }
+    var xe, x : int;
+    {
+        delta <- -1;
+        xe <- rings + 4 ;
+    }

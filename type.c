@@ -73,9 +73,9 @@ void printType(Type type) {
             printf("nothing");
             break;
         case TYPE_FUNCTION:
-            printf("Function(");
+            printf("Function(Return Type: ");
             printType(type->u.function.returnType);
-            printf(")(");
+            printf(", Parameter Types: ");
             TypeList param = type->u.function.params;
             while (param != NULL) {
                 printType(param->type);
@@ -89,3 +89,4 @@ void printType(Type type) {
             break;
     }
 }
+
