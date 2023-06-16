@@ -20,6 +20,23 @@ SymbolEntry *insert(char *name, Type t)
   printf("\n");
   return newEntry(name, t);
 }
+void process_fpar_defs(ast a, TypeList *params) {
+  if (a->k == FPAR_DEF) {
+    // Create a new node for the parameter list
+    TypeList newParam = (TypeList)malloc(sizeof(struct TypeList_tag));
+    newParam->type = a->right->type; // The type of the parameter
+    newParam->next = *params;
+    *params = newParam;
+
+    // Insert parameters into symbol table
+    process_id_list(a->middle, a->right->type);
+  }
+  else if (a->k == FPAR_DEFS) {
+    process_fpar_defs(a->left, params);
+    process_fpar_defs(a->right, params);
+  }
+}
+
 void process_id_list(ast a, Type type)
 {
   if (a->k == ID)
@@ -46,20 +63,31 @@ void ast_sem(ast a)
   {
 
   case FUN:
-  {
+{
     printf("Entering FUNCTION declaration.\n");
 
     // Handle the function's parameter types and return type
     Type returnType = a->right->type;
+
     // Handle the function's parameter types
     TypeList params = NULL; // Initialize params to NULL
-    // TODO: Traverse the part of AST that holds function parameters
+
+    // Traverse the part of AST that holds function parameters
     // and create TypeList `params` accordingly
+    ast paramListNode = a->middle; // This holds the parameter list
+    while (paramListNode != NULL)
+    {
+        Type paramType = paramListNode->type;
+        params = addTypeToList(params, paramType); // You might need to define addTypeToList function
+
+        // Move to the next parameter
+        paramListNode = paramListNode->right;
+    }
 
     // Check if params are NULL (meaning no parameters)
     if (params == NULL)
     {
-      printf("Function has no parameters.\n");
+        printf("Function has no parameters.\n");
     }
 
     // Create the function type
@@ -71,12 +99,13 @@ void ast_sem(ast a)
     // Check the function's return type
     if (a->right->type != tyNOTHING && a->right->type != tyINT && a->right->type != tyCHAR)
     {
-      error("Invalid function return type");
-      return;
+        error("Invalid function return type");
+        return;
     }
     printf("Finished FUNCTION declaration.\n");
     return;
-  }
+}
+
 
   case VAR:
   {

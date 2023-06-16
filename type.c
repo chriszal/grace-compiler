@@ -23,6 +23,12 @@ Type createFunctionType(Type returnType, TypeList params) {
     t->u.function.params = params;
     return t;
 }
+TypeList addTypeToList(TypeList list, Type type) {
+    TypeList newNode = malloc(sizeof(struct TypeList_tag));
+    newNode->type = type;
+    newNode->next = list;
+    return newNode;
+}
 
 
 int equalType(Type type1, Type type2) {

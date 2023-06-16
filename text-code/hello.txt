@@ -1,6 +1,11 @@
-fun hello ( ): int
- var xe, x ,y: int;
-{
-    x <- -1;
-    xe <- x + 4 ;
-}
+fun hello ( rings : int): int
+    fun hanoi (y,d : int) : nothing
+    
+    {
+    
+    }
+    var xe, x ,y: int;
+    {
+        rings <- -1;
+        xe <- x + 4 ;
+    }

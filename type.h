@@ -39,6 +39,7 @@ extern const Type tyNOTHING;
 
 
 Type createFunctionType(Type returnType, TypeList params);
+TypeList addTypeToList(TypeList list, Type type) ;
 
 int equalType(Type type1, Type type2);
 void printType(Type type);
