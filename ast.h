@@ -1,7 +1,6 @@
 #ifndef AST_H
 #define AST_H
 
-
 typedef enum {
     ID,
     NUM,

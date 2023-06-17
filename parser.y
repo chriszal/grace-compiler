@@ -4,8 +4,8 @@
 #include <stdlib.h>
 #include "ast.h"
 #include "print.h"
-#include "compile.h"
-
+#include "irgen.h"
+#include <llvm-c/Core.h>
 
 extern int yylex();
 extern int yyparse();
@@ -63,7 +63,7 @@ void yyerror(const char *msg);
 %%
 
 program:
-    func_def                                   { print_ast($1);}
+    func_def                                   { print_ast($1);  generate_ir($1);}
     
 
 func_def:
