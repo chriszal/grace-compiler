@@ -1,41 +1,112 @@
 #include <llvm-c/Core.h>
 #include <stdio.h>
+#include <string.h>
 #include "ast.h"
 
-LLVMValueRef generate_ir(ast node) {
-  if (node == NULL) {
+LLVMValueRef generate_ir(ast node)
+{
+  if (node == NULL)
+  {
     return NULL;
   }
 
   LLVMModuleRef module = LLVMModuleCreateWithName("my_module");
   LLVMBuilderRef builder = LLVMCreateBuilder();
 
-  // Define the function signature
-  LLVMTypeRef paramTypes[] = { LLVMPointerType(LLVMInt32Type(), 0), LLVMPointerType(LLVMInt32Type(), 0) };
-  LLVMTypeRef funcType = LLVMFunctionType(LLVMInt32Type(), paramTypes, 2, 0);
-  LLVMValueRef func = LLVMAddFunction(module, "add", funcType);
-  LLVMBasicBlockRef entry = LLVMAppendBasicBlock(func, "entry");
-  LLVMPositionBuilderAtEnd(builder, entry);
+  // Variables for holding function and block
+  LLVMValueRef func = NULL;
+  LLVMBasicBlockRef block = NULL;
 
   // Generate IR based on AST nodes
-  LLVMValueRef result = NULL;
-  switch (node->k) {
-    case ASSIGN: {
-      LLVMValueRef lhs = LLVMBuildAlloca(builder, LLVMInt32Type(), "");
-      LLVMValueRef rhs = LLVMConstInt(LLVMInt32Type(), node->right->data.num, 1);
-      LLVMBuildStore(builder, rhs, lhs);
+  switch (node->k)
+  {
+  case FUNCTION_DEF:
+  {
+    LLVMTypeRef funcType;
+    switch (node->left->right->k)
+    { 
+    case INT:
+      funcType = LLVMFunctionType(LLVMInt32Type(), NULL, 0, 0);
       break;
-    }
-    case PLUS: {
-      LLVMValueRef lhs = generate_ir(node->left);
-      LLVMValueRef rhs = generate_ir(node->right);
-      result = LLVMBuildAdd(builder, lhs, rhs, "");
+    case CHAR:
+      funcType = LLVMFunctionType(LLVMInt8Type(), NULL, 0, 0);
       break;
-    }
-    // Handle other cases...
-
+    case NOTHING:
+      funcType = LLVMFunctionType(LLVMVoidType(), NULL, 0, 0);
+      break;
     default:
       break;
+    }
+    func = LLVMAddFunction(module, node->left->data.str, funcType);
+    block = LLVMAppendBasicBlock(func, "entry");
+    LLVMPositionBuilderAtEnd(builder, block);
+    break;
+  }
+  case VAR:
+  {
+    ast id_list = node->left;
+    while (id_list != NULL)
+    {
+      LLVMTypeRef varType = LLVMInt32Type();
+      LLVMValueRef var = LLVMBuildAlloca(builder, varType, id_list->data.str);
+      id_list = id_list->right;
+    }
+    break;
+  }
+  case ASSIGN:
+  {
+    ast l_value = node->left;
+    ast expr = node->right;
+    LLVMValueRef var = LLVMBuildLoad(builder, LLVMBuildAlloca(builder, LLVMInt32Type(), l_value->data.str), "");
+    LLVMValueRef value = generate_ir(expr);
+    LLVMBuildStore(builder, value, var);
+    break;
+  }
+  case FUNC_CALL:
+  {
+    char *funcName = node->data.str;
+
+    // Handle built-in function "puts"
+    if (strcmp(funcName, "puts") == 0)
+    {
+      LLVMValueRef putsFunc = LLVMGetNamedFunction(module, "puts");
+      LLVMValueRef arg = generate_ir(node->left);
+      LLVMBuildCall(builder, putsFunc, &arg, 1, "");
+    }
+    //HERE I CAN HANDLE MORE BUILD IN FUNCTIONS
+    break;
+  }
+  case BLOCK:
+  {
+    ast stmts = node->left;
+    while (stmts != NULL)
+    {
+      generate_ir(stmts->left);
+      stmts = stmts->right;
+    }
+    break;
+  }
+  case RETURN:
+  {
+    ast expr = node->left;
+    LLVMValueRef returnValue = generate_ir(expr);
+    LLVMBuildRet(builder, returnValue);
+    break;
+  }
+  case NUM:
+  {
+    int num = node->data.num;
+    return LLVMConstInt(LLVMInt32Type(), num, 0);
+  }
+  case STR:
+  {
+    char *str = node->data.str;
+    LLVMValueRef strValue = LLVMBuildGlobalStringPtr(builder, str, "globalstr");
+    return strValue;
+  }
+  // Handle other cases...
+  default:
+    break;
   }
 
   LLVMDisposeBuilder(builder);
@@ -48,5 +119,5 @@ LLVMValueRef generate_ir(ast node) {
   // Clean up LLVM objects
   LLVMDisposeModule(module);
 
-  return result;
+  return NULL;
 }
