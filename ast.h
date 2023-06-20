@@ -1,6 +1,9 @@
 #ifndef AST_H
 #define AST_H
 
+#include <llvm-c/Core.h>
+
+
 typedef enum {
     ID,
     NUM,
@@ -58,6 +61,8 @@ typedef struct node {
     struct node *left;
     struct node *middle;
     struct node *right;
+    LLVMValueRef addr;
+
 } *ast;
 
 

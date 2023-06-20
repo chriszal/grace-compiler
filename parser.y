@@ -5,7 +5,6 @@
 #include "ast.h"
 #include "print.h"
 #include "irgen.h"
-#include <llvm-c/Core.h>
 
 extern int yylex();
 extern int yyparse();
@@ -61,9 +60,9 @@ void yyerror(const char *msg);
 %left T_MULTIPLY
 
 %%
-
+// print_ast($1);
 program:
-    func_def                                   { print_ast($1);  generate_ir($1);}
+    func_def                                   {  irgen($1);}
     
 
 func_def:

@@ -1,17 +1,15 @@
-LLVM_CONFIG ?= llvm-config
-
-CFLAGS := $(shell $(LLVM_CONFIG) --cflags)
-LDFLAGS := $(shell $(LLVM_CONFIG) --ldflags --system-libs --libs core)
-
 .PHONY: minibasic
 
+CFLAGS  = `llvm-config --cflags`
+LDFLAGS = `llvm-config --libs --cflags --ldflags all`
+
 minibasic: lexer.o parser.o ast.o irgen.o print.o
-	$(CC) $^ -o $@ $(CFLAGS) $(LDFLAGS)
+	$(CC) $^ -o $@ $(LDFLAGS)
+
+libminibasic:
 
 lexer.o: ast.h
-
 parser.o: ast.h
-
 irgen.o: irgen.h
 
 lexer.c: lexer.l parser.h
@@ -21,10 +19,11 @@ parser.c parser.h: parser.y
 	bison -d -o parser.c parser.y
 
 clean:
-	rm -f *.o lexer.c parser.c parser.h
+	rm -f *.o
 
 distclean: clean
-	rm -f minibasic
+	rm -f minibasic lexer.c parser.c parser.h
+
 
 run: minibasic
 	./minibasic < $(INPUT)

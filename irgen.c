@@ -1,30 +1,39 @@
-#include <llvm-c/Core.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "ast.h"
+#include <llvm-c/Core.h>
+#include <llvm-c/Analysis.h>
+#include <llvm-c/ExecutionEngine.h>
+#include <llvm-c/Target.h>
+#include <llvm-c/Transforms/Scalar.h>
+#include <llvm-c/Transforms/Utils.h>
 
-LLVMValueRef generate_ir(ast node)
+LLVMBuilderRef builder;
+LLVMModuleRef mod;
+LLVMValueRef mainFunc;
+LLVMValueRef putiFunc;
+LLVMValueRef theVars;
+LLVMTypeRef theVars_type;
+LLVMValueRef writeIntegerFunc;
+LLVMTypeRef writeInteger_type;
+
+void irgen_aux(ast node)
 {
   if (node == NULL)
   {
-    return NULL;
+    printf("Skipping NULL node\n");
+    return;
   }
 
-  LLVMModuleRef module = LLVMModuleCreateWithName("my_module");
-  LLVMBuilderRef builder = LLVMCreateBuilder();
-
-  // Variables for holding function and block
-  LLVMValueRef func = NULL;
-  LLVMBasicBlockRef block = NULL;
-
-  // Generate IR based on AST nodes
   switch (node->k)
   {
   case FUNCTION_DEF:
   {
+    // printf("Processing node FUNCTION_DEF kind. \n");
     LLVMTypeRef funcType;
     switch (node->left->right->k)
-    { 
+    {
     case INT:
       funcType = LLVMFunctionType(LLVMInt32Type(), NULL, 0, 0);
       break;
@@ -37,87 +46,216 @@ LLVMValueRef generate_ir(ast node)
     default:
       break;
     }
-    func = LLVMAddFunction(module, node->left->data.str, funcType);
-    block = LLVMAppendBasicBlock(func, "entry");
-    LLVMPositionBuilderAtEnd(builder, block);
-    break;
+    mainFunc = LLVMAddFunction(mod, node->left->data.str, funcType);
+    LLVMBasicBlockRef entry = LLVMAppendBasicBlock(mainFunc, "entry");
+    LLVMPositionBuilderAtEnd(builder, entry);
+    if (node->middle != NULL)
+    {
+      irgen_aux(node->middle);
+    }
+    if (node->right != NULL)
+    {
+      irgen_aux(node->right);
+    }
+    LLVMBuildRetVoid(builder);
+    // printf("Finished node FUNCTION_DEF kind. \n");
+    return;
   }
+
   case VAR:
   {
-    ast id_list = node->left;
-    while (id_list != NULL)
+    // printf("Processing VAR kind. \n");
+
+    LLVMTypeRef varType;
+    switch (node->right->k)
     {
-      LLVMTypeRef varType = LLVMInt32Type();
-      LLVMValueRef var = LLVMBuildAlloca(builder, varType, id_list->data.str);
-      id_list = id_list->right;
+    case INT:
+      varType = LLVMInt32Type();
+      break;
+    case CHAR:
+      varType = LLVMInt8Type();
+      break;
+    case ARRAY:
+      varType = LLVMArrayType(LLVMInt32Type(), node->right->data.num);
+      break;
+    default:
+      break;
     }
-    break;
+    // making them global for now because i do not have the symbol table to grab the id after
+    LLVMValueRef globalVar = LLVMAddGlobal(mod, varType, node->left->data.str);
+    node->addr = globalVar;
+    // printf("Finished VAR kind. \n");
+
+    return;
   }
   case ASSIGN:
   {
-    ast l_value = node->left;
-    ast expr = node->right;
-    LLVMValueRef var = LLVMBuildLoad(builder, LLVMBuildAlloca(builder, LLVMInt32Type(), l_value->data.str), "");
-    LLVMValueRef value = generate_ir(expr);
-    LLVMBuildStore(builder, value, var);
-    break;
-  }
-  case FUNC_CALL:
-  {
-    char *funcName = node->data.str;
+    // printf("Processing ASSIGN kind. \n");
 
-    // Handle built-in function "puts"
-    if (strcmp(funcName, "puts") == 0)
-    {
-      LLVMValueRef putsFunc = LLVMGetNamedFunction(module, "puts");
-      LLVMValueRef arg = generate_ir(node->left);
-      LLVMBuildCall(builder, putsFunc, &arg, 1, "");
-    }
-    //HERE I CAN HANDLE MORE BUILD IN FUNCTIONS
-    break;
+    irgen_aux(node->right);
+    LLVMValueRef val = node->right->addr;
+
+    irgen_aux(node->left);
+    LLVMValueRef var = node->left->addr;
+
+    LLVMBuildStore(builder, val, var);
+    // printf("Finished Assign kind. \n");
+
+    return;
   }
+
+  case ID:
+  {
+    // printf("Processing ID kind. \n");
+    LLVMValueRef var = LLVMGetNamedGlobal(mod, node->data.str);
+    if (var == NULL)
+    {
+      fprintf(stderr, "Variable %s not declared\n", node->data.str);
+      exit(-1);
+    }
+    node->addr = var;
+    // printf("Finished ID kind. \n");
+    return;
+  }
+
+  case NUM:
+    // printf("Processing NUM kind. \n");
+    // printf("Num: %d\n", node->data.num);
+    node->addr = LLVMConstInt(LLVMInt32Type(), node->data.num, 0);
+    // printf("Finished NUM kind. \n");
+    return;
+
+  case ID_LIST:
+  {
+    printf("Processing ID_LIST kind. \n");
+    ast currentNode = node;
+    while (currentNode != NULL)
+    {
+      // process each identifier node
+      irgen_aux(currentNode);
+      currentNode = currentNode->right;
+    }
+    printf("Finished ID_LIST kind. \n");
+    return;
+  }
+
   case BLOCK:
   {
-    ast stmts = node->left;
-    while (stmts != NULL)
+    // printf("Processing BLOCK kind. \n");
+    ast currentNode = node->left;
+    while (currentNode != NULL)
     {
-      generate_ir(stmts->left);
-      stmts = stmts->right;
+      // process each statement node
+      irgen_aux(currentNode->left);
+      currentNode = currentNode->right;
     }
-    break;
+    // printf("Finished processing BLOCK kind. \n");
+    return;
   }
-  case RETURN:
+
+  case ARG_LIST:
   {
-    ast expr = node->left;
-    LLVMValueRef returnValue = generate_ir(expr);
-    LLVMBuildRet(builder, returnValue);
-    break;
+    // printf("Processing ARG_LIST kind. \n");
+
+    LLVMValueRef *args = malloc(sizeof(LLVMValueRef));
+    int num_args = 0;
+
+    for (ast currentNode = node; currentNode != NULL; currentNode = currentNode->right)
+    {
+      irgen_aux(currentNode->left);
+      args[num_args] = currentNode->left->addr;
+      num_args++;
+    }
+
+    node->addr = args;
+    node->data.num = num_args;
+
+    // printf("Finished processing ARG_LIST kind. \n");
+    return;
   }
-  case NUM:
-  {
-    int num = node->data.num;
-    return LLVMConstInt(LLVMInt32Type(), num, 0);
-  }
+
   case STR:
+    node->addr = LLVMBuildGlobalStringPtr(builder, node->data.str, "globalstr");
+    return;
+  case FUNC_CALL:
   {
-    char *str = node->data.str;
-    LLVMValueRef strValue = LLVMBuildGlobalStringPtr(builder, str, "globalstr");
-    return strValue;
+    // printf("Processing FUNC_CALL kind. \n");
+    LLVMValueRef func = LLVMGetNamedFunction(mod, node->data.str);
+    if (func == NULL)
+    {
+      fprintf(stderr, "Function %s not declared\n", node->data.str);
+      exit(-1);
+    }
+
+    if (strcmp(node->data.str, "puti") == 0)
+    {
+      func = writeIntegerFunc;
+    }
+
+    if (node->left != NULL)
+    {
+      irgen_aux(node->left);
+    }
+    LLVMValueRef *args = (LLVMValueRef *)node->left->addr;
+    int num_args = node->left->data.num;
+
+    if (LLVMGetTypeKind(LLVMTypeOf(args[0])) == LLVMPointerTypeKind)
+    {
+      args[0] = LLVMBuildLoad(builder, args[0], "");
+    }
+
+    LLVMBuildCall(builder, func, args, num_args, "");
+    // printf("Finished FUNC_CALL kind. \n");
+    return;
   }
-  // Handle other cases...
+
+  case NEGATIVE:
+  {
+    LLVMValueRef val = LLVMBuildNeg(builder, node->left->addr, "negtmp");
+    node->addr = val;
+    break;
+  }
+  case PLUS:
+  {
+    LLVMValueRef leftVal = node->left->addr;
+    LLVMValueRef rightVal = node->right->addr;
+    LLVMValueRef sumVal = LLVMBuildAdd(builder, leftVal, rightVal, "addtmp");
+    node->addr = sumVal;
+    break;
+  }
+
   default:
     break;
   }
+}
 
+void irgen(ast root)
+{
+  mod = LLVMModuleCreateWithName("minibasic");
+  builder = LLVMCreateBuilder();
+  theVars_type = LLVMArrayType(LLVMInt32Type(), 26);
+  theVars = LLVMAddGlobal(mod, theVars_type, "vars");
+  LLVMSetLinkage(theVars, LLVMInternalLinkage);
+  LLVMSetInitializer(theVars, LLVMConstNull(theVars_type));
+
+  LLVMTypeRef writeInteger_param_types[] = {LLVMInt32Type()};
+  writeInteger_type = LLVMFunctionType(LLVMVoidType(), writeInteger_param_types, 1, 0);
+  writeIntegerFunc = LLVMAddFunction(mod, "writeInteger", writeInteger_type);
+  LLVMSetLinkage(writeIntegerFunc, LLVMExternalLinkage);
+
+  LLVMTypeRef putiParamtypes[] = {LLVMInt32Type()};
+  LLVMTypeRef puti_type = LLVMFunctionType(LLVMVoidType(), putiParamtypes, 1, 0);
+  putiFunc = LLVMAddFunction(mod, "puti", puti_type);
+  LLVMSetLinkage(putiFunc, LLVMExternalLinkage);
+  // LLVMAddAlias(mod, puti_type, writeIntegerFunc, "puti");
+
+  // Start generating code
+  irgen_aux(root);
+
+  // Handle necessary cleanup
   LLVMDisposeBuilder(builder);
-
-  // Print the generated LLVM IR
-  char *irCode = LLVMPrintModuleToString(module);
+  char *irCode = LLVMPrintModuleToString(mod);
   printf("%s", irCode);
   LLVMDisposeMessage(irCode);
-
-  // Clean up LLVM objects
-  LLVMDisposeModule(module);
-
-  return NULL;
+  LLVMDisposeModule(mod);
 }
