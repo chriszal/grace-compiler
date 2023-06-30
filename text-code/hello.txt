@@ -1,4 +1,4 @@
-fun hello ( ): nothing
+fun main ( ): nothing
  var xe: int;
 {
     xe <- 5;

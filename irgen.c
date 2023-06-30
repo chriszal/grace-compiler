@@ -83,6 +83,9 @@ void irgen_aux(ast node)
     }
     // making them global for now because i do not have the symbol table to grab the id after
     LLVMValueRef globalVar = LLVMAddGlobal(mod, varType, node->left->data.str);
+    LLVMSetLinkage(globalVar, LLVMInternalLinkage);  
+    LLVMSetInitializer(globalVar, LLVMConstNull(varType)); 
+
     node->addr = globalVar;
     // printf("Finished VAR kind. \n");
 
